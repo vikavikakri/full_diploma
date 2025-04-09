@@ -1,0 +1,235 @@
+/* Основной контейнер */
+
+body {
+    overflow-x: hidden;
+}
+
+.container-ent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+
+/* Кнопка "назад" */
+
+.back-button-ent {
+    background-color: #ffd54f !important;
+    border: 3px solid #3d5d52 !important;
+    border-radius: 20px !important;
+    color: #3d5d52 !important;
+    padding: 8px 16px !important;
+    margin-top: 10px !important;
+    margin-left: 15px !important;
+}
+
+
+/* Заголовок */
+
+.title-container-ent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: #F6F3EE;
+    border: 3px solid #3d5d52;
+    border-radius: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.title-container-ent::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 100%;
+    height: 100%;
+    border: 3px solid #3d5d52;
+    border-radius: 15px;
+    background-color: #e4e4e4;
+    z-index: -1;
+}
+
+.title-ent {
+    font-weight: 500;
+}
+
+.subtitle-ent {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* Контейнер с курсами */
+
+.main-container-ent {
+    position: relative;
+    margin-top: 40px;
+    width: 90%;
+    max-width: 95%;
+    margin-left: auto;
+    margin-right: 0;
+    padding-right: 0;
+    right: 0;
+}
+
+
+/* Тень (фон) */
+
+.shadow-box-ent {
+    position: absolute;
+    bottom: -25px;
+    left: -38px;
+    width: 100%;
+    height: 90%;
+    background-color: #e4e4e4;
+    border: 6px dashed #3d5d52;
+    border-radius: 25px;
+    z-index: -1;
+    opacity: 0.8;
+    background-size: 10px 10px;
+}
+
+
+/* Основной контейнер */
+
+.content-box-ent {
+    background-color: #D4E39E;
+    padding: 30px;
+    border-radius: 25px 3px 3px 25px;
+    border: 3px solid #3d5d52;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 500px;
+}
+
+
+/* Кнопки курсов */
+
+.course-button-ent {
+    background-color: #F6F3EE !important;
+    color: #3d5d52 !important;
+    border: 3px solid #3d5d52 !important;
+    border-radius: 10px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    text-transform: none !important;
+    width: 100%;
+    height: 120px !important;
+}
+
+.course-title-ent {
+    font-weight: bold;
+    font-size: 23px;
+}
+
+.course-info-ent {
+    color: #666;
+    font-size: 18px;
+    margin-left: 15px;
+}
+
+@media (max-width: 480px) {
+    .content-box-ent {
+        width: 330px;
+        height: 400px;
+    }
+    .shadow-box-ent {
+        width: 100%;
+        height: 95%;
+        bottom: -15px;
+        left: -25px;
+    }
+    .course-title-ent {
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .course-info-ent {
+        color: #666;
+        font-size: 16px;
+        margin-left: 15px;
+    }
+}
+
+.section-title-about-ent {
+    background-color: #d1c4e9;
+    color: #3d5d52;
+    border: 3px solid #3d5d52;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 260px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    justify-content: center !important;
+}
+
+.main-container-about-ent {
+    background-color: #d1c4e9;
+    border-radius: 0px 80px 0px 00px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+.lesson-block-about-ent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Центрируем блоки по горизонтали */
+}
+
+.lesson-block-about-ent.left {
+    align-items: flex-start;
+}
+
+.lesson-block-about-ent.right {
+    align-items: flex-end;
+    /* Выровнять по правому краю */
+}
+
+.lesson-title-about-ent {
+    font-family: "Tektur", sans-serif;
+    background-color: #3d5d52;
+    color: #d1c4e9;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.lesson-text-about-ent {
+    font-family: "Tektur", sans-serif;
+    margin-top: 10px;
+    max-width: 90%;
+    font-weight: 500 !important;
+    color: #3d5d52;
+    font-size: 18px;
+}
+
+.lesson-block-about-ent.left .lesson-text-about-ent {
+    text-align: left;
+}
+
+.lesson-block-about-ent.right .lesson-text-about-ent {
+    text-align: right;
+}

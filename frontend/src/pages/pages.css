@@ -1,0 +1,550 @@
+body {
+    font-family: 'Tektur', sans-serif !important;
+    margin: 0;
+    padding: 0;
+    background-color: #F6F3EE;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Основной контейнер */
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+    width: 100%;
+}
+
+
+/* Контентная область */
+
+.content-container {
+    border: 5px solid #325348;
+    width: 100%;
+    min-height: 55vh;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 60px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+
+/* Текстовая секция */
+
+.text-section {
+    max-width: 450px;
+    margin-bottom: 20px;
+}
+
+
+/* Заголовки и текст */
+
+h1 {
+    font-size: 3vw;
+    font-weight: 700;
+    line-height: 1.2;
+    padding-top: 1vw;
+    color: #325348;
+}
+
+p {
+    font-size: 1.5vw;
+    line-height: 1.5;
+    color: #325348;
+}
+
+
+/* Кнопка */
+
+.start-button {
+    margin-top: 15px;
+    padding: 12px 22px;
+    font-size: 1.8vw;
+    font-weight: 500 !important;
+    border-radius: 15px;
+    background: #BCBDDC;
+    color: #3D5D52;
+    border: 3px solid #325348;
+    cursor: pointer;
+    font-family: "Tektur", sans-serif;
+}
+
+
+/* Изображение */
+
+.man-image {
+    max-width: 29vw;
+    height: auto;
+    margin-left: 4vw;
+    margin-top: 18px;
+}
+
+
+/* Адаптивность */
+
+@media (max-width: 768px) {
+    .content-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        min-height: calc(100vh - 80px);
+    }
+    .text-section {
+        max-width: 100%;
+        text-align: center;
+    }
+    h1 {
+        font-size: 5vw;
+    }
+    p {
+        font-size: 3vw;
+    }
+    .start-button {
+        font-size: 2.5vw;
+    }
+    .man-image {
+        max-width: 50vw;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-container {
+        min-height: 55vh;
+    }
+    h1 {
+        font-size: 7vw !important;
+        padding-top: 2vw;
+    }
+    p {
+        font-size: 4vw;
+    }
+    .start-button {
+        font-size: 3.5vw;
+        padding: 10px 18px;
+    }
+    .man-image {
+        max-width: 72%;
+        height: auto;
+    }
+}
+
+
+/*2 страница главного меню */
+
+.section-title {
+    font-family: 'Tektur', sans-serif !important;
+    text-align: center;
+    font-size: 2.5vw;
+    color: #325348;
+    margin-bottom: 20px !important;
+    margin-top: 20px !important;
+}
+
+.levels-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.level-box {
+    width: 220px;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.green-box-level {
+    background-color: #F6F3EE;
+    border: 4px solid #325348;
+}
+
+.purple-box-level {
+    background-color: #F6F3EE;
+    border: 4px solid #7779CF;
+}
+
+.stars {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.star-filled {
+    color: #ffd943;
+    font-size: 30px;
+}
+
+.star-empty {
+    color: #d0cccc;
+    font-size: 30px;
+}
+
+.level-typo {
+    font-family: 'Tektur', sans-serif !important;
+    background-color: #E9B824 !important;
+    font-size: 1.2rem !important;
+    font-weight: 500;
+    color: #325348 !important;
+    border: 3px solid #325348;
+    padding: 5px 12px !important;
+    border-radius: 10px !important;
+    display: inline-block !important;
+    text-align: center !important;
+    margin-bottom: 10px !important;
+}
+
+.level-text {
+    font-family: 'Tektur', sans-serif !important;
+    font-weight: 500;
+    color: #325348;
+    font-size: 17px;
+}
+
+
+/*Секция о нас */
+
+.about-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 40px 60px;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+.about-text {
+    max-width: 50%;
+    background-color: #325348;
+    border-radius: 15px;
+}
+
+.about-title {
+    font-family: 'Tektur', sans-serif !important;
+    font-size: clamp(24px, 4.5vw, 48px);
+    padding: 25px 25px 5px;
+    color: #F6F3EE;
+    font-weight: 600 !important;
+    margin-bottom: 10px !important;
+}
+
+.about-description {
+    font-family: 'Tektur', sans-serif !important;
+    color: #F6F3EE;
+    padding: 5px 25px 25px;
+    font-weight: 400 !important;
+    font-size: larger !important;
+    line-height: 1.5 !important;
+}
+
+.image-frame {
+    width: 280px;
+    height: 460px;
+    margin-right: 40px;
+    margin-top: 30px;
+    background-color: #BCBDDC;
+    border-radius: 15px;
+    border: 4px solid #325348;
+    position: relative;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.floating-image {
+    width: 400px;
+    position: absolute;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.stat-box {
+    border: 4px solid #325348;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    width: 200px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    background-color: #E9B824;
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+    color: #325348;
+}
+
+.stat-label {
+    font-size: 1.3rem;
+    color: #325348;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .about-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    .about-text {
+        max-width: 100%;
+    }
+    .about-image img {
+        max-width: 80%;
+        margin-top: 20px;
+    }
+    .stats-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .stat-box {
+        width: 90%;
+    }
+}
+
+
+/*Секция с курсами */
+
+.courses-section {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.course-box {
+    flex: 1;
+    padding: 25px;
+    border-radius: 20px;
+    color: #325348;
+    font-family: 'Tektur', sans-serif !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Размещает заголовок сверху, текст в центре, кнопку снизу */
+    min-height: 300px;
+    /* Фиксируем высоту, чтобы кнопки всегда были на одном уровне */
+}
+
+.purple-box {
+    background-color: #C9C4F2;
+    color: #325348;
+    margin: 20px;
+}
+
+.purple-box h1 {
+    color: #325348;
+    margin: 0px 0px;
+}
+
+.p-course-purp {
+    color: #325348;
+}
+
+.green-box {
+    background-color: #325348;
+    margin: 20px;
+}
+
+.p-course-green {
+    color: #BCBDDC;
+}
+
+.green-box h1 {
+    color: #BCBDDC;
+    margin: 0px 0px;
+}
+
+.course-box h1 {
+    font-size: 24px !important;
+    margin-bottom: 15px;
+}
+
+.course-box p {
+    font-size: 16px;
+}
+
+.course-button {
+    font-family: 'Tektur', sans-serif !important;
+    display: inline-block;
+    background-color: #C9C4F2;
+    border: 4px solid #325348;
+    color: #325348;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.course-button.light {
+    background-color: #325348;
+    border: 4px solid #C9C4F2;
+    color: #C9C4F2;
+}
+
+@media (max-width: 768px) {
+    .courses-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    .course-box {
+        width: 90%;
+        max-width: 400px;
+        padding: 20px;
+        margin: 10px auto;
+    }
+    .green-box,
+    .purple-box {
+        margin: 10px auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .courses-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    .course-box {
+        width: 90%;
+        max-width: 350px;
+        padding: 15px;
+        margin: 10px auto;
+    }
+    .green-box,
+    .purple-box {
+        margin: 10px auto;
+    }
+}
+
+
+/* */
+
+
+/* Training Section Styles */
+
+.training-section {
+    padding: 60px 0;
+    background-color: #f4f3ef;
+    flex-wrap: wrap;
+    /* Это поможет карточкам не слипаться */
+    gap: 20px;
+}
+
+.section-title {
+    font-weight: 500 !important;
+    margin-bottom: 40px !important;
+    color: #325348;
+    text-align: center !important;
+    font-size: 2.5rem !important;
+}
+
+.training-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 20px;
+    border-radius: 22px !important;
+    text-align: center;
+}
+
+.card-content {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.math-card {
+    font-family: 'Tektur', sans-serif !important;
+    background-color: #F6F3EE !important;
+    border: 4px solid #7779CF!important;
+    color: #325348 !important;
+}
+
+.tests-card {
+    font-family: 'Tektur', sans-serif !important;
+    background-color: #F6F3EE !important;
+    border: 4px solid #325348!important;
+    color: #12183b !important;
+}
+
+.programming-card {
+    font-family: 'Tektur', sans-serif !important;
+    background-color: #F6F3EE !important;
+    border: 4px solid #7779CF!important;
+    color: #325348 !important;
+}
+
+.analytical-card {
+    font-family: 'Tektur', sans-serif !important;
+    background-color: #F6F3EE !important;
+    border: 4px solid #325348!important;
+    color: #12183b !important;
+    margin-top: 27px !important;
+}
+
+@media (max-width: 900px) {
+    .training-card {
+        margin-bottom: 20px !important;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+    .training-section {
+        padding: 60px 20px;
+        /* Уменьшаем отступы с боков */
+    }
+}
+
+@media (max-width: 486px) {
+    .training-card {
+        margin-bottom: 20px !important;
+        /* Отступ снизу */
+    }
+    .section-title {
+        font-size: 1.75rem;
+    }
+    .training-section {
+        padding: 40px 15px;
+        /* Еще меньше отступов на самых маленьких экранах */
+    }
+}
+
+.girl-image-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.girl-image {
+    width: 200px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    bottom: -42px;
+}

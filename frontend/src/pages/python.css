@@ -1,0 +1,193 @@
+/* Основной контейнер */
+
+.course-container-python {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+
+/* Кнопка "назад" */
+
+.back-button-ent-python {
+    background-color: #ffd54f !important;
+    border: 3px solid #3d5d52 !important;
+    border-radius: 20px !important;
+    width: 60px;
+    color: #3d5d52 !important;
+    padding: 8px !important;
+}
+
+
+/* Контейнер заголовка */
+
+.header-container-python {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+}
+
+.course-title-python {
+    font-weight: 500 !important;
+    font-size: 20px;
+    color: #3d5d52;
+    margin-left: 80px !important;
+}
+
+.course-lessons-python {
+    color: #3d5d52;
+    font-size: 18px !important;
+    margin-right: 130px !important;
+}
+
+
+/* Основной контейнер с тенью */
+
+.main-content-python {
+    position: relative;
+    margin-left: 25px;
+    margin-top: 20px;
+    width: 85%;
+    max-width: 95%;
+    height: 400px;
+}
+
+
+/* Тень (задний блок) */
+
+.shadow-box-python {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 92%;
+    height: 95%;
+    border: 3px solid #3d5d52;
+    background-color: #b0a4d6;
+    border-radius: 15px;
+    z-index: -1;
+}
+
+
+/* Контейнер с текстом */
+
+.info-box-python {
+    background-color: #d1c4e9;
+    padding: 20px;
+    border-radius: 15px;
+    height: 350px;
+    border: 3px solid #3d5d52;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    margin-left: 50px;
+}
+
+
+/* Текст описания */
+
+.course-description-python {
+    font-family: 'Tektur', sans-serif !important;
+    color: #3d5d52;
+    font-size: clamp(18px, 5vw, 28px) !important;
+    max-width: 80%;
+    max-height: 90%;
+    margin-top: 15px !important;
+    overflow: hidden;
+}
+
+
+/* Контейнер для изображения */
+
+.image-box-python {
+    width: 70px;
+    height: 70px;
+    background-color: #c5e1a5;
+    border: 3px solid #3d5d52;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+
+/* Логотип Python */
+
+.python-logo-python {
+    width: 60px;
+    height: 60px;
+}
+
+.lessons-container-python {
+    width: 100% !important;
+    height: 100% !important;
+    background-color: #c5e1a5;
+    border: 3px solid #2f4f4f;
+    margin-top: 100px;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+.lesson-buttons-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.lesson-button-python {
+    width: 100%;
+    padding: 14px 24px;
+    font-family: 'Tektur', sans-serif;
+    font-size: 18px;
+    color: #2f4f4f;
+    background-color: #fdfcf7;
+    border: 3px solid #2f4f4f;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.lesson-button-python:hover {
+    background-color: #9db581;
+}
+
+@media (max-width: 430px) {
+    .info-box-python {
+        margin-left: -10px !important;
+        height: 350px !important;
+        width: 95% !important;
+    }
+    .shadow-box-python {
+        height: 97% !important;
+        width: 97% !important;
+        bottom: -20px !important;
+        right: -45px !important;
+    }
+    .course-description-python {
+        font-family: 'Tektur', sans-serif !important;
+        color: #3d5d52;
+        font-size: 15.2px !important;
+        font-weight: 500 !important;
+        max-width: 70%;
+        max-height: 90%;
+    }
+    .course-title-python {
+        margin-left: 20px !important;
+    }
+    .course-lessons-python {
+        margin-right: 60px !important;
+    }
+}

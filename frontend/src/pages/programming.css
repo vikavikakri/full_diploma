@@ -1,0 +1,233 @@
+/* Основной контейнер */
+
+.container-prog {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+
+/* Кнопка "назад" */
+
+.back-button-prog {
+    background-color: #ffd54f !important;
+    border: 3px solid #3d5d52 !important;
+    border-radius: 20px !important;
+    color: #3d5d52 !important;
+    padding: 8px 16px !important;
+    margin-top: 10px !important;
+    margin-left: 15px !important;
+}
+
+
+/* Заголовок */
+
+.title-container-prog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: #F6F3EE;
+    border: 3px solid #3d5d52;
+    border-radius: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.title-container-prog::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 100%;
+    height: 100%;
+    border: 3px solid #3d5d52;
+    border-radius: 15px;
+    background-color: #e4e4e4;
+    z-index: -1;
+}
+
+.title-prog {
+    font-weight: 500;
+}
+
+.subtitle-prog {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* Контейнер с курсами */
+
+.main-container-prog {
+    position: relative;
+    margin-top: 40px;
+    width: 90%;
+    max-width: 95%;
+    margin-left: 0;
+    padding-left: 0;
+    left: 0;
+}
+
+
+/* Тень (фон) */
+
+.shadow-box-prog {
+    position: absolute;
+    bottom: -25px;
+    right: -5px;
+    width: 95%;
+    height: 90%;
+    background-color: #e4e4e4;
+    border: 4px dashed #3d5d52;
+    border-width: 6px;
+    /* Можно увеличить для более заметного пунктира */
+    border-spacing: 10px !important;
+    border-radius: 25px;
+    z-index: -1;
+    opacity: 0.8;
+    background-size: 10px 10px;
+}
+
+
+/* Основной контейнер */
+
+.content-box-prog {
+    background-color: #d1c4e9;
+    padding: 30px;
+    border-radius: 3px 25px 25px 3px;
+    border: 3px solid #3d5d52;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    height: 500px;
+}
+
+
+/* Кнопки курсов */
+
+.course-button-prog {
+    background-color: #F6F3EE !important;
+    color: #3d5d52 !important;
+    border: 3px solid #3d5d52 !important;
+    border-radius: 10px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    text-transform: none !important;
+    width: 100%;
+    height: 80px !important;
+}
+
+.course-title-prog {
+    font-weight: bold;
+    font-size: 23px;
+}
+
+.course-info-prog {
+    color: #666;
+    font-size: 18px;
+    margin-left: 15px;
+}
+
+@media (max-width: 480px) {
+    .content-box-prog {
+        width: 330px;
+        height: 400px;
+    }
+    .shadow-box-prog {
+        width: 100%;
+        height: 95%;
+        bottom: -15px;
+        right: -45px;
+    }
+    .course-title-prog {
+        font-weight: bold;
+        font-size: 20px;
+    }
+    .course-info-prog {
+        color: #666;
+        font-size: 16px;
+        margin-left: 15px;
+    }
+}
+
+.section-title-about-progr {
+    background-color: #D4E39E;
+    color: #3d5d52;
+    border: 3px solid #3d5d52;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 180px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    justify-content: center !important;
+}
+
+.main-container-about-progr {
+    background-color: #D4E39E;
+    border-radius: 80px 0px 0px 0px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+.lesson-block-about-progr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Центрируем блоки по горизонтали */
+}
+
+.lesson-block-about-progr.left {
+    align-items: flex-start;
+}
+
+.lesson-block-about-progr.right {
+    align-items: flex-end;
+    /* Выровнять по правому краю */
+}
+
+.lesson-title-about-progr {
+    font-family: "Tektur", sans-serif;
+    background-color: #3d5d52;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.lesson-text-about-progr {
+    font-family: "Tektur", sans-serif;
+    margin-top: 10px;
+    max-width: 90%;
+    font-weight: 500 !important;
+    color: #3d5d52;
+    font-size: 18px;
+}
+
+.lesson-block-about-progr.left .lesson-text-about-progr {
+    text-align: left;
+}
+
+.lesson-block-about-progr.right .lesson-text-about-progr {
+    text-align: right;
+}

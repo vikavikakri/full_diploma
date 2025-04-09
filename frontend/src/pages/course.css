@@ -1,0 +1,471 @@
+@import url('https://fonts.googleapis.com/css2?family=Tektur:wdth,wght@75..100,400..900&display=swap');
+.back-button {
+    background-color: #FFD54F !important;
+    border: 3px solid #3D5D52 !important;
+    border-radius: 20px !important;
+    color: #3D5D52 !important;
+    padding: 8px 16px !important;
+    margin-top: 10px !important;
+}
+
+.back-button:hover {
+    background-color: #FFCA28 !important;
+}
+
+.main-container {
+    flex-grow: 1;
+    background-color: #c5c5e1;
+    border: 5px solid #3D5D52;
+    border-radius: 36px 36px 5px 5px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: visible;
+    margin-bottom: 40px;
+}
+
+
+/* Dots at the top of the container */
+
+.dots-container2 {
+    position: absolute;
+    top: 30px;
+    width: 96%;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 20px;
+}
+
+.container-dot {
+    width: 28px;
+    height: 28px;
+    background-color: #F6F3EE;
+    border-radius: 50%;
+}
+
+
+/* Character illustration in the middle */
+
+.girl-image2 {
+    width: 200px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    bottom: -40px;
+}
+
+
+/* Courses container */
+
+.courses-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 50px 40px;
+    box-sizing: border-box;
+}
+
+
+/* Card wrapper for 3D effect */
+
+.card-wrapper {
+    position: relative;
+    width: 40%;
+    max-width: 400px;
+    margin: 40px 0;
+}
+
+
+/* Card shadow for 3D effect */
+
+.card-shadow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #3D5D52;
+    border: 3px solid #3D5D52;
+    border-radius: 16px;
+    bottom: -10px;
+    right: -10px;
+    z-index: 1;
+}
+
+
+/* Course cards */
+
+.course-card {
+    position: relative;
+    z-index: 2;
+    background-color: white !important;
+    border: 3px solid #3D5D52 !important;
+    border-radius: 16px !important;
+    transition: transform 0.3s ease !important;
+    height: 170px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+}
+
+
+/* Course title */
+
+.course-title {
+    background-color: #FFD54F;
+    padding: 10px 20px;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    color: #3D5D52 !important;
+    text-align: center;
+    border-radius: 4px;
+}
+
+
+/* Arrow containers */
+
+.arrow-container {
+    position: absolute;
+    bottom: -50px;
+    z-index: 5;
+}
+
+.left-arrow {
+    left: 60%;
+    transform: translateX(-100%) !important;
+    height: 30px;
+}
+
+.right-arrow {
+    right: 10%;
+    transform: translateX(-100%);
+    height: 70px;
+}
+
+.arrow-image {
+    width: 80px !important;
+    height: auto;
+}
+
+.arrow-image2 {
+    width: 47px !important;
+    height: auto;
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 768px) {
+    .courses-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .card-wrapper {
+        width: 80%;
+        margin: 20px 0;
+    }
+    .dots-container {
+        top: 15px;
+    }
+    .container-dot {
+        width: 24px;
+        height: 24px;
+    }
+    .arrow-container {
+        bottom: -80px;
+    }
+    .left-arrow {
+        left: 0;
+    }
+    .right-arrow {
+        right: 0;
+    }
+    .arrow-image {
+        width: 60px;
+    }
+    .character-image {
+        width: 80px;
+        top: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .courses-container {
+        padding: 40px 20px;
+    }
+    .card-wrapper {
+        width: 90%;
+    }
+    .container-dot {
+        width: 20px;
+        height: 20px;
+    }
+    .course-title {
+        font-size: 1.2rem !important;
+        padding: 8px 16px;
+    }
+    .arrow-image {
+        width: 50px;
+    }
+    .character-image {
+        width: 60px;
+        top: 40px;
+    }
+    .arrow-container {
+        bottom: -40px;
+    }
+    .arrow-image {
+        width: 25px;
+    }
+}
+
+.back-button-container {
+    position: relative;
+}
+
+.course-heading {
+    margin: 1rem 0;
+    color: #3D5D52;
+    font-weight: bold;
+    font-family: 'Tektur', sans-serif;
+}
+
+
+/* Arrow image sizing */
+
+.arrow-image {
+    width: 90px;
+}
+
+
+/* Arrow containers positioning */
+
+.left-arrow {
+    position: absolute;
+    bottom: -65px;
+    left: 50%;
+    transform: translateX(-100%);
+    z-index: 5;
+}
+
+.right-arrow {
+    position: absolute;
+    bottom: -110px;
+    right: 50%;
+    transform: translateX(110%);
+    z-index: 5;
+}
+
+
+/* Course lists container below arrows */
+
+.course-lists-container {
+    margin-top: 10rem;
+    width: 100%;
+}
+
+
+/* Detailed course cards */
+
+.detailed-course-card {
+    border: 2px solid #3A5A40;
+    font-family: 'Tektur', sans-serif;
+    border-radius: 8px !important;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #F6F3EE !important;
+}
+
+.category-card {
+    border: 2px solid #3A5A40;
+    border-radius: 12px !important;
+    padding: 1rem;
+    background-color: #D4E39E !important;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+
+/* Для экранов с шириной 480px и меньше */
+
+@media (max-width: 480px) {
+    .category-card {
+        margin-bottom: 15px;
+        /* Увеличиваем отступ снизу */
+    }
+}
+
+@media (max-width: 480px) {
+    .arrow-image,
+    .arrow-image2 {
+        display: none;
+        /* Скрыть стрелки на маленьких экранах */
+    }
+}
+
+
+/* Course name and info */
+
+.course-name {
+    color: #3A5A40;
+    font-weight: 500;
+}
+
+.course-info {
+    color: #3A5A40;
+    text-align: right;
+}
+
+
+/* Button container */
+
+.button-container {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Start course button */
+
+.start-course-btn {
+    background-color: #F4D862 !important;
+    color: #3A5A40 !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    border: 3px solid #3A5A40 !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    padding: 0.5rem 2rem !important;
+    font-family: "Tektur", sans-serif !important;
+}
+
+
+/* Course title in original cards */
+
+.course-title {
+    font-family: 'Tektur', sans-serif;
+}
+
+.course-selection-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.course-lists-container {
+    flex-grow: 1;
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 768px) {
+    .detailed-course-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .course-info {
+        text-align: left;
+        margin-top: 0.5rem;
+    }
+    .course-lists-container {
+        margin-top: 10rem;
+        /* Less margin on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .course-lists-container {
+        margin-top: 8rem;
+        /* Even less margin on very small screens */
+    }
+}
+
+
+/* footer*/
+
+.footer-container3 {
+    width: 97%;
+    background-color: #BCBDDC;
+    padding: 110px 0 20px;
+    border-radius: 26px 26px 0 0;
+    margin: 40px auto 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 200px !important;
+}
+
+.dots-container3 {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 99%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.footer-content3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    z-index: 10;
+    /* Чтобы текст был поверх других элементов */
+}
+
+.footer-text3 {
+    color: #3D5D52;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 1px;
+    font-weight: 500;
+    font-family: 'Tektur', sans-serif;
+    cursor: pointer;
+}
+
+.footer-dot3 {
+    width: 28px;
+    height: 28px;
+    background-color: #F6F3EE;
+    border-radius: 50%;
+}
+
+.footer-link {
+    text-decoration: none;
+    /* Убираем подчеркивание */
+}
+
+@media (max-width: 768px) {
+    .dots-container3 {
+        top: 45px;
+        padding: 0 6vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .dots-container3 {
+        top: 30px;
+        padding: 0 1vw;
+    }
+    .footer-dot3 {
+        width: 24px;
+        height: 24px;
+    }
+}

@@ -1,0 +1,79 @@
+.reset-password-container-resetpass {
+    background-color: #e3dacc;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reset-password-card-resetpass {
+    background-color: #fdfaf0;
+    border: 2px solid #445c4c;
+    border-radius: 20px;
+    width: 400px;
+    padding: 30px 40px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.back-button-resetpass {
+    background-color: #f6c90e;
+    border: 2px solid #3a5a40;
+    padding: 1px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+.title-resetpass {
+    text-align: center;
+    color: #3a5a40;
+    margin: 40px auto 30px auto;
+    font-size: 24px;
+    background-color: #b8bddf;
+    border: 3px solid #3a5a40;
+    padding: 8px 20px;
+    border-radius: 8px;
+    width: 21vw;
+    font-weight: 600 !important;
+}
+
+.input-resetpass .MuiOutlinedInput-root {
+    background-color: #ede8ca;
+    border-radius: 8px;
+}
+
+.reset-button-resetpass {
+    font-family: 'Tektur', sans-serif !important;
+    margin-top: 35px !important;
+    background-color: #cde0a3 !important;
+    color: #3a5a40 !important;
+    border: 3px solid #3a5a40 !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    box-shadow: none !important;
+}
+
+.message-resetpass {
+    margin-top: 20px;
+    color: #444;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .reset-password-card-resetpass {
+        width: 70% !important;
+        height: auto !important;
+    }
+    .title-resetpass {
+        font-size: 22px !important;
+        width: 35vw;
+        margin: 55px auto 30px auto;
+    }
+    .reset-button-resetpass {
+        margin-top: 45px;
+    }
+}
