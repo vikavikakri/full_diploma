@@ -12,6 +12,10 @@ const CoursePage = () => {
     navigate(-1);
   };
 
+  const handleLessonClick = (lessonNumber) => {
+    navigate(`/less${lessonNumber}html`);
+  };
+
   return (
     <div className="course-container-html">
       {/* Кнопка "назад" */}
@@ -52,9 +56,9 @@ const CoursePage = () => {
       { number: 2, title: "Списки, таблицы и формы" },
       { number: 3, title: "Введение в CSS" },
       { number: 4, title: "Работа с цветами, шрифтами и текстовыми стилями" },
-      { number: 5, title: "Завершающий проект: Создание простого веб-сайта" },
+      { number: 5, title: "Завершающий проект: Создание карточки" },
     ].map((lesson) => (
-      <button key={lesson.number} className="lesson-button-html">
+      <button key={lesson.number} className="lesson-button-html" onClick={() => handleLessonClick(lesson.number)}>
         <strong>Урок {lesson.number}.</strong>&nbsp;&nbsp;{lesson.title}
       </button>
     ))}

@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"go-password-reset/db"
 	"net/http"
 	"strings"
@@ -57,9 +56,6 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Код сброса истёк", http.StatusBadRequest)
 		return
 	}
-
-	fmt.Println("Код, введённый пользователем:", req.Code)
-	fmt.Println("Код из базы данных:", codeFromDB)
 
 	// Проверка кода
 	if strings.TrimSpace(strings.ToLower(req.Code)) != strings.TrimSpace(strings.ToLower(codeFromDB)) {

@@ -1,0 +1,211 @@
+.lesson-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background-color: #ede8ca;
+    overflow: hidden;
+}
+
+.lesson-left {
+    flex: 1;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    scroll-behavior: smooth;
+    background-color: #fdfaf0;
+    border-right: 2px solid #e0e0e0;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.text-bigger {
+    font-weight: 600;
+    font-size: 24px;
+}
+
+.text-prebig {
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.lesson-right {
+    width: 50%;
+    height: 100vh;
+    padding: 30px;
+    background-color: #f0f3f7;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: hidden;
+    /* не даём ей скроллиться */
+}
+
+.back-button-less1pyt {
+    background-color: #ffd54f !important;
+    border: 3px solid #3d5d52 !important;
+    border-radius: 20px !important;
+    width: 60px;
+    color: #3d5d52 !important;
+    padding: 8px !important;
+}
+
+.lesson-title {
+    font-family: 'Tektur', sans-serif !important;
+    font-size: 28px;
+    font-weight: 600 !important;
+    margin-bottom: 20px;
+    color: #3a5a40;
+}
+
+.lesson-content {
+    font-family: 'Tektur', sans-serif !important;
+    font-size: 16px;
+    color: #444;
+    line-height: 1.7;
+}
+
+.lesson-text {
+    font-family: 'Tektur', sans-serif !important;
+    font-size: 22px;
+    color: #3a5a40;
+}
+
+.lesson-task {
+    font-family: 'Tektur', sans-serif !important;
+    color: #3a5a40;
+    font-size: 18px;
+}
+
+.lesson-code-block {
+    background-color: #f5f5f5;
+    padding: 16px;
+    border-radius: 12px;
+    font-family: 'Fira Code', monospace;
+    margin: 20px 0;
+    color: #2d2d2d;
+    border: 1px solid #ddd;
+}
+
+.lesson-code-block strong {
+    color: #007acc;
+}
+
+.lesson-subtitle {
+    font-size: 20px;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.editor-container {
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.run-button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: fit-content;
+}
+
+.run-button:hover {
+    background-color: #1565c0;
+}
+
+.output {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    border: 1px solid #ddd;
+    color: #1e1e1e;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.xp-display {
+    font-size: 16px;
+    color: #388e3c;
+    font-weight: bold;
+}
+
+.button-go-1put {
+    font-family: 'Tektur', sans-serif !important;
+    color: #3a5a40 !important;
+    border-radius: 10px !important;
+    border: 3px solid #3a5a40 !important;
+    background-color: #cde0a3 !important;
+    box-shadow: none !important;
+}
+
+.button-xp-1put {
+    font-family: 'Tektur', sans-serif !important;
+    color: #3a5a40 !important;
+    border: 3px solid #3a5a40 !important;
+    border-radius: 10px !important;
+    background-color: #b8bddf !important;
+    box-shadow: none !important;
+}
+
+
+/* Стилизация вертикальной прокрутки для .lesson-left */
+
+.lesson-left::-webkit-scrollbar {
+    width: 10px;
+}
+
+.lesson-left::-webkit-scrollbar-thumb {
+    background-color: #3a5a40;
+    border-radius: 10px;
+    border: 2px solid #e3dacc;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.lesson-left::-webkit-scrollbar-track {
+    background-color: #e3dacc;
+    border-radius: 10px;
+}
+
+.lesson-left::-webkit-scrollbar-thumb:hover {
+    background-color: #9696c1;
+    border-color: #3a5a40;
+}
+
+@media (max-width: 480px) {
+    .lesson-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .lesson-left,
+    .lesson-right {
+        width: 100%;
+        padding: 20px;
+    }
+    .lesson-left {
+        border-right: none;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    .lesson-title {
+        font-size: 22px;
+    }
+    .button-go-1put,
+    .button-xp-1put {
+        width: 100%;
+        font-size: 14px;
+    }
+    .lesson-right {
+        padding-top: 0;
+    }
+    .monaco-editor {
+        width: 100% !important;
+    }
+}

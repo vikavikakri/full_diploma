@@ -12,6 +12,10 @@ const CoursePage = () => {
     navigate(-1);
   };
 
+  const handleLessonClick = (lessonNumber) => {
+    navigate(`/less${lessonNumber}csh`);
+  };
+
   return (
     <div className="course-container-csh">
       {/* Кнопка "назад" */}
@@ -49,11 +53,11 @@ const CoursePage = () => {
   <div className="lesson-buttons-wrapper">
     {[
       { number: 1, title: "Введение в C# и первый код" },
-      { number: 2, title: "Условия, циклы и массивы" },
+      { number: 2, title: "Условия и циклы" },
       { number: 3, title: "Функции и основы ООП в C#" },
-      { number: 4, title: "Мини-проект и закрепление знаний" },
+      { number: 4, title: "Наследование и полиморфизм" },
     ].map((lesson) => (
-      <button key={lesson.number} className="lesson-button-csh">
+      <button key={lesson.number} className="lesson-button-csh" onClick={() => handleLessonClick(lesson.number)}>
         <strong>Урок {lesson.number}.</strong>&nbsp;&nbsp;{lesson.title}
       </button>
     ))}

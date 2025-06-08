@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Grid, Paper, Container } from '@mui/material';
+import { Box, Typography, Grid, Paper, Container, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import girl2Image from '../assets/girl2.png';
 import man2Image from '../assets/man1.png';
 import girlImage from '../assets/girl1.png';
 import './pages.css';
-
 
 const levels = [
   {
@@ -37,16 +36,52 @@ const levels = [
 
 const statistics = [
   { value: "700", label: "учеников" },
-  { value: "6", label: "направлений" },
+  { value: "7", label: "направлений" },
   { value: "30", label: "уроков" },
 ];
 
 const HomePage = () => {
-
-  const navigate = useNavigate(); // инициализация
+  const navigate = useNavigate();
+  const [showAuthDialog, setShowAuthDialog] = useState(false); // Состояние для модального окна
+  const [redirectPath, setRedirectPath] = useState(''); // Для хранения пути
 
   const handleStartClick = () => {
-    navigate('/courses'); // переход на страницу курсов
+    navigate('/courses');
+  };
+
+  const handleProgramClick = () => {
+    const username = localStorage.getItem('username'); // Проверяем авторизацию
+    if (!username) {
+      setRedirectPath('/programming');
+      setShowAuthDialog(true);
+    } else {
+      navigate('/programming');
+    }
+  };
+
+  const handleEntClick = () => {
+    const username = localStorage.getItem('username'); // Проверяем авторизацию
+    if (!username) {
+      setRedirectPath('/ent');
+      setShowAuthDialog(true);
+    } else {
+      navigate('/ent');
+    }
+  };
+
+  const handleAuthDialogClose = () => {
+    setShowAuthDialog(false);
+    setRedirectPath('');
+  };
+
+  const handleRegisterRedirect = () => {
+    navigate('/loginreg', { state: { tab: 'register' } });
+    setShowAuthDialog(false);
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/loginreg', { state: { tab: 'login' } });
+    setShowAuthDialog(false);
   };
 
   return (
@@ -73,9 +108,9 @@ const HomePage = () => {
               <div className="stars">
                 {[...Array(4)].map((_, i) => (
                   <StarRoundedIcon
-                  key={i}
-                  className={i < level.stars ? 'star-filled' : 'star-empty'}
-              />              
+                    key={i}
+                    className={i < level.stars ? 'star-filled' : 'star-empty'}
+                  />              
                 ))}
               </div>
               <Typography className="level-typo">{level.title}</Typography>
@@ -106,7 +141,7 @@ const HomePage = () => {
           </div>
         ))}
       </div>
-            {/* Секция с курсами */}
+      {/* Секция с курсами */}
       <div className="courses-section">
         <div className="course-box purple-box">
           <h1 className='h1-course'>Курсы программирования</h1>
@@ -114,7 +149,7 @@ const HomePage = () => {
             Наши курсы программирования – это увлекательное путешествие в мир кода! Мы разработали 
             интерактивные занятия, которые помогут тебе шаг за шагом освоить Python, JavaScript и другие популярные языки.
           </p>
-          <button className="course-button">Начать обучение сейчас</button>
+          <button className="course-button" onClick={handleProgramClick}>Начать обучение сейчас</button>
         </div>
 
         <div className="course-box green-box">
@@ -124,7 +159,7 @@ const HomePage = () => {
             освоить весь необходимый материал, но и научит правильно распределять время, эффективно запоминать 
             информацию и справляться со сложными задачами.
           </p>
-          <button className="course-button light">Начать обучение сейчас</button>
+          <button className="course-button light" onClick={handleEntClick}>Начать обучение сейчас</button>
         </div>
       </div>
       <Box 
@@ -134,7 +169,7 @@ const HomePage = () => {
           backgroundColor: '#f4f3ef',
           padding: { xs: '40px 15px', sm: '60px 20px' },
           display: 'flex',
-          flexDirection: 'column', // Используем column для мобильных
+          flexDirection: 'column',
           gap: '20px',
           justifyContent: 'center',
         }}
@@ -206,12 +241,64 @@ const HomePage = () => {
         </Container>
       </Box>
 
+      <div className="girl-image-container">
+        <img src={girlImage} alt="Girl" className="girl-image" />
+      </div>
 
-    <div className="girl-image-container">
-      <img src={girlImage} alt="Girl" className="girl-image" />
+      {/* Модальное окно для неавторизованных пользователей */}
+      <Dialog open={showAuthDialog} onClose={handleAuthDialogClose}>
+        <DialogTitle sx={{ fontFamily: 'Tektur' }}>Требуется авторизация</DialogTitle>
+        <DialogContent>
+          Для того чтобы начать курс, зарегистрируйтесь или войдите в аккаунт.
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'space-between', padding: '16px' }}>
+          <Button
+            onClick={handleAuthDialogClose}
+            sx={{
+              backgroundColor: '#FF6347',
+              color: '#FFFFFF',
+              border: '3px solid #3a5a40',
+              fontFamily: 'Tektur',
+              '&:hover': {
+                backgroundColor: '#FF4500',
+              },
+            }}
+          >
+            Отмена
+          </Button>
+          <Box sx={{ display: 'flex', gap: '8px' }}>
+            <Button
+                            onClick={handleRegisterRedirect}
+                            sx={{
+                            backgroundColor: '#c5c5e1',
+                            color: '#3a5a40',
+                            border: '3px solid #3a5a40',
+                            fontFamily: 'Tektur',
+                            '&:hover': {
+                              backgroundColor: '#b2b2d9',
+                            },
+                          }}
+                          >
+                            Регистрация
+                          </Button>
+                          <Button
+                            onClick={handleLoginRedirect}
+                            sx={{
+                              backgroundColor: '#D4E39E',
+                              color: '#3a5a40',
+                              border: '3px solid #3a5a40',
+                              fontFamily: 'Tektur',
+                              '&:hover': {
+                                backgroundColor: '#bfcd8c',
+                              },
+                            }}
+                          >
+                            Вход
+                          </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
     </div>
-    </div>
-    
   );
 };
 

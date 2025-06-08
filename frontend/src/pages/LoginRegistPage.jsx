@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import './loginreg.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { TextField, Button, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff, ArrowBack, ArrowForward } from '@mui/icons-material';
+import { ProfileContext } from '../context/ProfileContext';
 
 const AuthForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { fetchProfile } = useContext(ProfileContext);
 
-  const [activeTab, setActiveTab] = useState('login');
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'login');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [useEmailLogin, setUseEmailLogin] = useState(false);
@@ -21,6 +24,13 @@ const AuthForm = () => {
     password: '',
     confirmPassword: ''
   });
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state]);
 
   const handleBackClick = () => {
     navigate('/');
@@ -32,17 +42,35 @@ const AuthForm = () => {
 
   const handleRegister = async () => {
     if (registerData.password !== registerData.confirmPassword) {
-      alert('Пароли не совпадают');
+      setError('Пароли не совпадают');
       return;
     }
 
     try {
       const response = await axios.post('http://localhost:5000/api/register', registerData);
+      setError('');
       alert('Регистрация успешна!');
-      setActiveTab('login');
+      setRegisterData({ username: '', email: '', phone: '', password: '', confirmPassword: '' });
+
+      // После успешной регистрации выполняем вход
+      const loginPayload = {
+        username: registerData.username,
+        password: registerData.password
+      };
+      const loginResponse = await axios.post('http://localhost:5000/api/login', loginPayload);
+
+      const token = loginResponse.data.token;
+      const user = loginResponse.data.user;
+
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('username', user.username);
+      localStorage.setItem('token', token);
+
+      await fetchProfile();
+      navigate('/profile'); // Перенаправляем на страницу профиля после регистрации
     } catch (error) {
-      console.error(error);
-      alert('Ошибка при регистрации');
+      console.error('Ошибка при регистрации:', error);
+      setError(error.response?.data?.error || 'Ошибка при регистрации');
     }
   };
 
@@ -62,10 +90,11 @@ const AuthForm = () => {
       localStorage.setItem('username', user.username);
       localStorage.setItem('token', token);
 
-      navigate('/');
+      await fetchProfile();
+      navigate('/'); // Перенаправляем на главную страницу после входа
     } catch (error) {
       console.error('Ошибка при входе:', error);
-      alert('Неверный логин/email или пароль');
+      setError(error.response?.data?.error || 'Неверный логин/email или пароль');
     }
   };
 
@@ -92,6 +121,7 @@ const AuthForm = () => {
         </div>
 
         <div className="form-content-login">
+          {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
           {activeTab === 'login' ? (
             <>
               <TextField
@@ -128,13 +158,13 @@ const AuthForm = () => {
               <Button
                 variant="text"
                 onClick={() => setUseEmailLogin(!useEmailLogin)}
-                className='button-change-logreg'
+                className="button-change-logreg"
               >
                 {useEmailLogin ? 'Войти по логину' : 'Войти по email'}
               </Button>
               <Button
                 variant="text"
-                className='button-forgpass-logreg'
+                className="button-forgpass-logreg"
                 onClick={handleForgpassClick}
               >
                 Забыли пароль?

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Paper, IconButton, Card, CardContent, Button, Grid } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box, Container, Typography, Paper, IconButton, Card, CardContent, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
 import arrow1Image from '../assets/arrow1.png';
 import arrow2Image from '../assets/arrow2.png';
 import './course.css';
@@ -11,6 +10,8 @@ import './course.css';
 const CourseSelection = () => {
   const navigate = useNavigate();
   const [totalDots, setTotalDots] = useState(16);
+  const [showAuthDialog, setShowAuthDialog] = useState(false); // Для модального окна
+  const [redirectPath, setRedirectPath] = useState(''); // Для хранения пути
 
   const technicalCourses = [
     { name: 'Курс Python', lessons: 6, duration: '1 час' },
@@ -36,14 +37,61 @@ const CourseSelection = () => {
       }
     };
 
-    updateDots(); // Call on load
-    window.addEventListener('resize', updateDots); // Update on screen resize
+    updateDots();
+    window.addEventListener('resize', updateDots);
 
-    return () => window.removeEventListener('resize', updateDots); // Clean up event
+    return () => window.removeEventListener('resize', updateDots);
   }, []);
 
   const handleBackClick = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
+  };
+
+  const handleAuthDialogClose = () => {
+    setShowAuthDialog(false);
+    setRedirectPath('');
+  };
+
+  const handleRegisterRedirect = () => {
+    navigate('/loginreg', { state: { tab: 'register' } });
+    setShowAuthDialog(false);
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/loginreg', { state: { tab: 'login' } });
+    setShowAuthDialog(false);
+  };
+
+  const CategoryCard = ({ courses, type }) => {
+    const path = type === "technical" ? "/programming" : "/ent";
+    const username = localStorage.getItem('username'); // Проверяем авторизацию
+
+    const handleStartCourseClick = () => {
+      if (!username) {
+        setRedirectPath(path); // Сохраняем путь для сообщения в модальном окне
+        setShowAuthDialog(true); // Открываем модальное окно
+      } else {
+        navigate(path); // Если авторизован, переходим на страницу курса
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    };
+
+    return (
+      <Card elevation={0} className="category-card">
+        {courses.map((course, index) => (
+          <CourseCard key={index} course={course} />
+        ))}
+        <Box className="button-container">
+          <Button
+            className="start-course-btn"
+            variant="contained"
+            onClick={handleStartCourseClick} // Обработчик с проверкой авторизации
+          >
+            Начать курс
+          </Button>
+        </Box>
+      </Card>
+    );
   };
 
   const CourseCard = ({ course }) => (
@@ -58,30 +106,6 @@ const CourseSelection = () => {
     </Paper>
   );
 
-  const CategoryCard = ({ courses, type }) => {
-    const path = type === "technical" ? "/programming" : "/ent";
-  
-    return (
-      <Card elevation={0} className="category-card">
-        {courses.map((course, index) => (
-          <CourseCard key={index} course={course} />
-        ))}
-        <Box className="button-container">
-          <Button
-            component={RouterLink}
-            to={path}
-            className="start-course-btn"
-            variant="contained"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          >
-            Начать курс
-          </Button>
-        </Box>
-      </Card>
-    );
-  };
-
-  // Footer component with scroll to top on link click
   const Footer = () => {
     const [totalDots, setTotalDots] = useState(16);
 
@@ -96,10 +120,10 @@ const CourseSelection = () => {
         }
       };
 
-      updateDots(); // Вызываем при загрузке
-      window.addEventListener('resize', updateDots); // Обновляем при изменении экрана
+      updateDots();
+      window.addEventListener('resize', updateDots);
 
-      return () => window.removeEventListener('resize', updateDots); // Чистим событие
+      return () => window.removeEventListener('resize', updateDots);
     }, []);
 
     return (
@@ -120,107 +144,161 @@ const CourseSelection = () => {
 
   return (
     <div className="hide-header">
-    <Container maxWidth="lg" sx={{ py: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ position: 'relative' }}>
-        <IconButton 
-          className="back-button" 
-          onClick={handleBackClick}
-          aria-label="назад"
-        >
-          <ArrowBackIcon />
-        </IconButton>
-      </Box>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        align="center" 
-        sx={{ 
-          my: 2, 
-          color: '#3D5D52', 
-          fontWeight: 'bold',
-          fontFamily: 'Tektur, sans-serif'
-        }}
-      >
-        Выбор Курса
-      </Typography>
-      
-      <Box className="main-container">
-        <Box className="dots-container2">
-          {Array.from({ length: totalDots }, (_, index) => (
-            <div key={index} className="container-dot"></div>
-          ))}
+      <Container maxWidth="lg" sx={{ py: 3, height: '100vh', display: 'flex', flexDirection: 'column', mt: 7 }}>
+        <Box sx={{ position: 'relative' }}>
+          <IconButton 
+            className="back-button" 
+            onClick={handleBackClick}
+            aria-label="назад"
+          >
+            <ArrowBackIcon />
+          </IconButton>
         </Box>
+        <Typography 
+          variant="h4" 
+          component="h1" 
+          align="center" 
+          sx={{ 
+            my: 2, 
+            color: '#3D5D52', 
+            fontWeight: 'bold',
+            fontFamily: 'Tektur, sans-serif'
+          }}
+        >
+          Выбор Курса
+        </Typography>
         
-        <Box className="courses-container">
-          <Box className="card-wrapper">
-            <Box className="card-shadow programming-shadow"></Box>
-            <Card className="course-card programming-card">
-              <CardContent>
-                <Typography className="course-title" sx={{ fontFamily: 'Tektur, sans-serif' }}>
-                  Программирование
-                </Typography>
-              </CardContent>
-            </Card>
-            <Box 
-              className="arrow-container left-arrow"
-              sx={{
-                position: 'absolute',
-                bottom: '-65px', // Опускаем ниже блока
-                left: '50%',
-                transform: 'translateX(-100%)',
-                zIndex: 5
-              }}
-            >
-              <img 
-                src={arrow1Image} 
-                alt="arrow" 
-                className="arrow-image"
-                style={{ width: '90px' }} // Уменьшаем размер стрелки
-              />
-            </Box>
+        <Box className="main-container">
+          <Box className="dots-container2">
+            {Array.from({ length: totalDots }, (_, index) => (
+              <div key={index} className="container-dot"></div>
+            ))}
           </Box>
           
-          {/* ENT Preparation card */}
-          <Box className="card-wrapper">
-            <Box className="card-shadow ent-shadow"></Box>
-            <Card className="course-card ent-card">
-              <CardContent>
-                <Typography className="course-title" sx={{ fontFamily: 'Tektur, sans-serif' }}>
-                  Подготовка к ЕНТ
-                </Typography>
-              </CardContent>
-            </Card>
-            <Box 
-              className="arrow-container right-arrow"
-              sx={{
-                position: 'absolute',
-                bottom: '-110px',
-                right: '50%',
-                transform: 'translateX(110%)',
-                zIndex: 5
-              }}
-            >
-              <img 
-                src={arrow2Image} 
-                alt="arrow" 
-                className="arrow-image2"
-              />
+          <Box className="courses-container">
+            <Box className="card-wrapper">
+              <Box className="card-shadow programming-shadow"></Box>
+              <Card className="course-card programming-card">
+                <CardContent>
+                  <Typography className="course-title" sx={{ fontFamily: 'Tektur, sans-serif' }}>
+                    Программирование
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Box 
+                className="arrow-container left-arrow"
+                sx={{
+                  position: 'absolute',
+                  bottom: '-65px',
+                  left: '50%',
+                  transform: 'translateX(-100%)',
+                  zIndex: 5
+                }}
+              >
+                <img 
+                  src={arrow1Image} 
+                  alt="arrow" 
+                  className="arrow-image"
+                  style={{ width: '90px' }}
+                />
+              </Box>
+            </Box>
+            
+            <Box className="card-wrapper">
+              <Box className="card-shadow ent-shadow"></Box>
+              <Card className="course-card ent-card">
+                <CardContent>
+                  <Typography className="course-title" sx={{ fontFamily: 'Tektur, sans-serif' }}>
+                    Подготовка к ЕНТ
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Box 
+                className="arrow-container right-arrow"
+                sx={{
+                  position: 'absolute',
+                  bottom: '-110px',
+                  right: '50%',
+                  transform: 'translateX(110%)',
+                  zIndex: 5
+                }}
+              >
+                <img 
+                  src={arrow2Image} 
+                  alt="arrow" 
+                  className="arrow-image2"
+                />
+              </Box>
             </Box>
           </Box>
         </Box>
-      </Box>
-        <Box className="course-lists-container" >
+        <Box className="course-lists-container">
           <Grid container spacing={4}>
-          <Grid item xs={12} md={6} sx={{ paddingTop: '0px !important' }}>
-            <CategoryCard courses={technicalCourses} type="technical" />
-          </Grid>
-          <Grid item xs={12} md={6} sx={{ paddingTop: '0px !important' }}>
-            <CategoryCard courses={educationalCourses} type="educational" />
-          </Grid>
+            <Grid item xs={12} md={6} sx={{ paddingTop: '0px !important' }}>
+              <CategoryCard courses={technicalCourses} type="technical" />
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ paddingTop: '0px !important' }}>
+              <CategoryCard courses={educationalCourses} type="educational" />
+            </Grid>
           </Grid>
         </Box>
-        <Footer /> 
-    </Container>
+
+        {/* Модальное окно для неавторизованных пользователей */}
+        <Dialog open={showAuthDialog} onClose={handleAuthDialogClose}>
+          <DialogTitle sx={{ fontFamily: 'Tektur' }}>Требуется авторизация</DialogTitle>
+          <DialogContent>
+            Для того чтобы начать курс, зарегистрируйтесь или войдите в аккаунт.
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'space-between', padding: '16px' }}>
+            <Button
+              onClick={handleAuthDialogClose}
+              sx={{
+                backgroundColor: '#FF6347',
+                color: '#FFFFFF',
+                border: '3px solid #3a5a40',
+                fontFamily: 'Tektur',
+                '&:hover': {
+                  backgroundColor: '#FF4500',
+                },
+              }}
+            >
+              Отмена
+            </Button>
+            <Box sx={{ display: 'flex', gap: '8px' }}>
+              <Button
+                onClick={handleRegisterRedirect}
+                sx={{
+                backgroundColor: '#c5c5e1',
+                color: '#3a5a40',
+                border: '3px solid #3a5a40',
+                fontFamily: 'Tektur',
+                '&:hover': {
+                  backgroundColor: '#b2b2d9',
+                },
+              }}
+              >
+                Регистрация
+              </Button>
+              <Button
+                onClick={handleLoginRedirect}
+                sx={{
+                  backgroundColor: '#D4E39E',
+                  color: '#3a5a40',
+                  border: '3px solid #3a5a40',
+                  fontFamily: 'Tektur',
+                  '&:hover': {
+                    backgroundColor: '#bfcd8c',
+                  },
+                }}
+              >
+                Вход
+              </Button>
+            </Box>
+          </DialogActions>
+        </Dialog>
+
+        <Footer />
+      </Container>
     </div>
   );
 };

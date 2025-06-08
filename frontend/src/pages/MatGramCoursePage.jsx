@@ -11,6 +11,10 @@ const CoursePage = () => {
     navigate(-1);
   };
 
+  const handleLessonClick = (lessonNumber) => {
+    navigate(`/less${lessonNumber}math`);
+  };
+
   return (
     <div className="course-container-matgram">
       {/* Кнопка "назад" */}
@@ -51,7 +55,7 @@ const CoursePage = () => {
       { number: 5, title: "Логика и текстовые задачи" },
       { number: 6, title: "Итоговый разбор + тренировочный тест" },
     ].map((lesson) => (
-      <button key={lesson.number} className="lesson-button-matgram">
+      <button key={lesson.number} className="lesson-button-matgram" onClick={() => handleLessonClick(lesson.number)}>
         <strong>Урок {lesson.number}.</strong>&nbsp;&nbsp;{lesson.title}
       </button>
     ))}

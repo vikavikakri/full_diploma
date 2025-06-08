@@ -12,6 +12,10 @@ const CoursePage = () => {
     navigate(-1);
   };
 
+  const handleLessonClick = (lessonNumber) => {
+    navigate(`/less${lessonNumber}go`);
+  };
+
   return (
     <div className="course-container-golang">
       {/* Кнопка "назад" */}
@@ -54,7 +58,7 @@ const CoursePage = () => {
       { number: 4, title: "Структуры, указатели и работа с мапами" },
       { number: 5, title: "Горутины и каналы. Мини-проект" },
     ].map((lesson) => (
-      <button key={lesson.number} className="lesson-button-golang">
+      <button key={lesson.number} className="lesson-button-golang" onClick={() => handleLessonClick(lesson.number)}>
         <strong>Урок {lesson.number}.</strong>&nbsp;&nbsp;{lesson.title}
       </button>
     ))}
