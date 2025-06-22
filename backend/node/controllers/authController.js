@@ -9,6 +9,12 @@ const registerUser = async(req, res) => {
         const { username, email, phone, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Проверка уникальности username
+        const usernameCheck = await db.query('SELECT username FROM users WHERE username = $1', [username]);
+        if (usernameCheck.rows.length > 0) {
+            return res.status(400).json({ error: 'Пользователь с таким именем уже существует' });
+        }
+
         // Вставка пользователя в таблицу users
         const userResult = await db.query(
             'INSERT INTO users (username, email, phone, password_hash) VALUES ($1, $2, $3, $4) RETURNING *', [username, email, phone, hashedPassword]
@@ -30,22 +36,35 @@ const registerUser = async(req, res) => {
         };
 
         // Начальные данные для active_courses и achievements
-        const initialActiveCourses = []; // Пустой массив
-        const initialAchievements = []; // Пустой массив
+        const initialActiveCourses = [];
+        const initialAchievements = [{
+            id: 1,
+            name: 'Новичок на борту',
+            description: 'Получено при первой регистрации',
+            xp_reward: 10,
+            date_earned: new Date().toISOString() // Используем ISO строку для совместимости
+        }];
+        const initialPoints = 10;
+
+        // Логирование для отладки
+        const achievementsJson = JSON.stringify(initialAchievements);
+        const activeCoursesJson = JSON.stringify(initialActiveCourses);
+        const avatarJson = JSON.stringify(initialAvatar);
+        console.log('Registering user:', user.id, 'initialAchievements:', achievementsJson, 'initialActiveCourses:', activeCoursesJson, 'initialPoints:', initialPoints);
 
         // Вставка профиля в таблицу user_profiles
         await db.query(
-            'INSERT INTO user_profiles (user_id, name, role, skills, active_courses, points, achievements, avatar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [user.id, username, 'Ученик', [], initialActiveCourses, 0, initialAchievements, initialAvatar]
+            'INSERT INTO user_profiles (user_id, name, role, skills, active_courses, points, achievements, avatar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [user.id, username, 'Ученик', '{}', activeCoursesJson, initialPoints, achievementsJson, avatarJson]
         );
 
         res.status(201).json({ message: 'Пользователь зарегистрирован', user: userResult.rows[0] });
     } catch (error) {
-        console.error('Ошибка при регистрации:', error);
-        res.status(500).json({ error: 'Ошибка при регистрации' });
+        console.error('Ошибка при регистрации:', error.stack);
+        res.status(500).json({ error: 'Ошибка при регистрации', details: error.message });
     }
 };
 
-// Оставшаяся часть authController.js без изменений
+// Оставшаяся часть authController.js
 const loginUser = async(req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -82,7 +101,7 @@ const loginUser = async(req, res) => {
             profile: profile,
         });
     } catch (error) {
-        console.error('Ошибка при входе:', error);
+        console.error('Ошибка при входе:', error.stack);
         res.status(500).json({ error: 'Ошибка при входе' });
     }
 };

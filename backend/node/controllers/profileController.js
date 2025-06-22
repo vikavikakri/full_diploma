@@ -9,10 +9,19 @@ const getProfile = async(req, res) => {
             return res.status(404).json({ error: 'Профиль не найден' });
         }
 
-        res.json(result.rows[0]);
+        let profile = result.rows[0];
+        let achievements = Array.isArray(profile.achievements) ?
+            profile.achievements :
+            typeof profile.achievements === 'string' ?
+            JSON.parse(profile.achievements || '[]') : [];
+        let points = profile.points || 0;
+
+        console.log('Profile loaded - achievements:', achievements, 'points:', points);
+
+        res.json(profile);
     } catch (error) {
-        console.error('Ошибка при получении профиля:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        console.error('Ошибка при получении профиля:', error.stack);
+        res.status(500).json({ error: 'Ошибка сервера', details: error.message });
     }
 };
 
@@ -35,8 +44,8 @@ const updateProfile = async(req, res) => {
 
         res.json(result.rows[0]);
     } catch (error) {
-        console.error('Ошибка при обновлении профиля:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        console.error('Ошибка при обновлении профиля:', error.stack);
+        res.status(500).json({ error: 'Ошибка сервера', details: error.message });
     }
 };
 
