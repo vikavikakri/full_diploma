@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Paper, IconButton, Card, CardContent, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import arrow1Image from '../assets/arrow1.png';
 import arrow2Image from '../assets/arrow2.png';
@@ -10,18 +9,28 @@ import './course.css';
 const CourseSelection = () => {
   const navigate = useNavigate();
   const [totalDots, setTotalDots] = useState(16);
-  const [showAuthDialog, setShowAuthDialog] = useState(false); // Для модального окна
-  const [redirectPath, setRedirectPath] = useState(''); // Для хранения пути
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [redirectPath, setRedirectPath] = useState('');
+
+  const courseRoutes = {
+    'Курс Python': '/python',
+    'Курс C#': '/csh',
+    'Курс HTML CSS': '/html',
+    'Курс Golang': '/golang',
+    'Курс Мат. грамотность': '/matgram',
+    'Курс Грамотность чтения': '/gramchten',
+    'Курс Основы информатики': '/osnovinfo',
+  };
 
   const technicalCourses = [
-    { name: 'Курс Python', lessons: 6, duration: '1 час' },
-    { name: 'Курс C++', lessons: 3, duration: '40 минут' },
+    { name: 'Курс Python', lessons: 15, duration: '2.5 часа' },
+    { name: 'Курс C#', lessons: 3, duration: '40 минут' },
     { name: 'Курс HTML CSS', lessons: 6, duration: '1.5 часа' },
     { name: 'Курс Golang', lessons: 5, duration: '1 час' },
   ];
 
   const educationalCourses = [
-    { name: 'Курс Мат. грамотность', lessons: 6, duration: '1 час' },
+    { name: 'Курс Мат. грамотность', lessons: 11, duration: '2 часа' },
     { name: 'Курс Грамотность чтения', lessons: 4, duration: '1 час' },
     { name: 'Курс Основы информатики', lessons: 5, duration: '1.5 часа' },
   ];
@@ -62,41 +71,71 @@ const CourseSelection = () => {
     setShowAuthDialog(false);
   };
 
+  const handleCourseClick = (courseName) => {
+    const username = localStorage.getItem('username');
+    const path = courseRoutes[courseName];
+    if (!username) {
+      setRedirectPath(path);
+      setShowAuthDialog(true);
+    } else {
+      navigate(path);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const CategoryCard = ({ courses, type }) => {
-    const path = type === "technical" ? "/programming" : "/ent";
-    const username = localStorage.getItem('username'); // Проверяем авторизацию
+    const path = type === 'technical' ? '/programming' : '/ent';
+    const username = localStorage.getItem('username');
 
     const handleStartCourseClick = () => {
       if (!username) {
-        setRedirectPath(path); // Сохраняем путь для сообщения в модальном окне
-        setShowAuthDialog(true); // Открываем модальное окно
+        setRedirectPath(path);
+        setShowAuthDialog(true);
       } else {
-        navigate(path); // Если авторизован, переходим на страницу курса
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        navigate(path);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
     return (
       <Card elevation={0} className="category-card">
-        {courses.map((course, index) => (
-          <CourseCard key={index} course={course} />
-        ))}
         <Box className="button-container">
           <Button
             className="start-course-btn"
             variant="contained"
-            onClick={handleStartCourseClick} // Обработчик с проверкой авторизации
+            onClick={handleStartCourseClick}
+            sx={{ mb: 2}}
           >
-            Начать курс
+            Полный каталог курсов
           </Button>
         </Box>
+        {courses.map((course, index) => (
+          <CourseCard key={index} course={course} />
+        ))}
       </Card>
     );
   };
 
   const CourseCard = ({ course }) => (
-    <Paper elevation={0} className="detailed-course-card">
-      <Typography className="course-name" sx={{ fontFamily: 'Tektur, sans-serif' }}>
+    <Paper
+      elevation={0}
+      className="detailed-course-card"
+      onClick={() => handleCourseClick(course.name)}
+      sx={{
+        cursor: 'pointer',
+        '&:hover': {
+          backgroundColor: '#f5e8c7',
+          transition: 'background-color 0.3s ease',
+        },
+      }}
+    >
+      <Typography 
+        className="course-name" 
+        sx={{ 
+          fontFamily: 'Tektur, sans-serif',
+          color: '#3D5D52',
+        }}
+      >
         {course.name}
       </Typography>
       <Typography className="course-info" sx={{ fontFamily: 'Tektur, sans-serif' }}>
@@ -243,7 +282,6 @@ const CourseSelection = () => {
           </Grid>
         </Box>
 
-        {/* Модальное окно для неавторизованных пользователей */}
         <Dialog open={showAuthDialog} onClose={handleAuthDialogClose}>
           <DialogTitle sx={{ fontFamily: 'Tektur' }}>Требуется авторизация</DialogTitle>
           <DialogContent>
@@ -268,14 +306,14 @@ const CourseSelection = () => {
               <Button
                 onClick={handleRegisterRedirect}
                 sx={{
-                backgroundColor: '#c5c5e1',
-                color: '#3a5a40',
-                border: '3px solid #3a5a40',
-                fontFamily: 'Tektur',
-                '&:hover': {
-                  backgroundColor: '#b2b2d9',
-                },
-              }}
+                  backgroundColor: '#c5c5e1',
+                  color: '#3a5a40',
+                  border: '3px solid #3a5a40',
+                  fontFamily: 'Tektur',
+                  '&:hover': {
+                    backgroundColor: '#b2b2d9',
+                  },
+                }}
               >
                 Регистрация
               </Button>

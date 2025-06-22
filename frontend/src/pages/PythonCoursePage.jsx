@@ -78,7 +78,7 @@ const CoursePage = () => {
           Курс Python
         </Typography>
         <Typography variant="body1" className="course-lessons-python" sx={{ fontFamily: 'Tektur, sans-serif' }}>
-          6 уроков
+          15 уроков
         </Typography>
       </Box>
 
@@ -105,6 +105,15 @@ const CoursePage = () => {
             { number: 4, title: "Циклы в Python" },
             { number: 5, title: "Функции и модули" },
             { number: 6, title: "Списки и циклы" },
+            { number: 7, title: "Строки и их методы" },
+            { number: 8, title: "Арифметические операции и числа" },
+            { number: 9, title: "Ввод пользователя" },
+            { number: 10, title: "Простые условия" },
+            { number: 11, title: "Простые функции" },
+            { number: 12, title: "Работа с числами в списках" },
+            { number: 13, title: "Простая обработка строк" },
+            { number: 14, title: "Мини-калькулятор" },
+            { number: 15, title: "Простая игра Угадай число" },
           ].map((lesson) => (
             <button
               key={lesson.number}

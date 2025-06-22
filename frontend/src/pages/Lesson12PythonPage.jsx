@@ -6,8 +6,8 @@ import Editor from '@monaco-editor/react';
 import { ProfileContext } from '../context/ProfileContext';
 import './lesson3python.css';
 
-const Lesson2Python = () => {
-  const [code, setCode] = useState("x = \nprint(x)");
+const Lesson12Python = () => {
+  const [code, setCode] = useState("numbers = [1, 2, 3, 4, 5]\ntotal = 0\nfor num in numbers:\n    total += \nprint(total)");
   const [output, setOutput] = useState('');
   const [xp, setXp] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -31,7 +31,7 @@ const Lesson2Python = () => {
         const data = await response.json();
         setXp(data.points || 0);
         const pythonCourse = data.active_courses.find(course => course.course_id === 1);
-        if (pythonCourse && pythonCourse.completed_lessons.includes(2)) {
+        if (pythonCourse && pythonCourse.completed_lessons.includes(12)) {
           setAlreadyCompleted(true);
           setSubmitted(true);
           const repeatCount = pythonCourse.repeat_attempts || 0;
@@ -51,8 +51,9 @@ const Lesson2Python = () => {
 
   const handleRunCode = async () => {
     try {
-      if (code.trim() === "x = 5\nprint(x)") {
-        setOutput("5");
+      const correctCode = "numbers = [1, 2, 3, 4, 5]\ntotal = 0\nfor num in numbers:\n    total += num\nprint(total)";
+      if (code.trim() === correctCode) {
+        setOutput("15");
       } else {
         setOutput("Ошибка: попробуйте снова.");
       }
@@ -62,7 +63,8 @@ const Lesson2Python = () => {
   };
 
   const handleSubmit = async () => {
-    if (code.trim() !== "x = 5\nprint(x)") {
+    const correctCode = "numbers = [1, 2, 3, 4, 5]\ntotal = 0\nfor num in numbers:\n    total += num\nprint(total)";
+    if (code.trim() !== correctCode) {
       showErrorNotification('Ошибка: вы неверно решили урок.');
       return;
     }
@@ -77,7 +79,7 @@ const Lesson2Python = () => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
           },
-          body: JSON.stringify({ course_id: 1, lesson_number: 2 }),
+          body: JSON.stringify({ course_id: 1, lesson_number: 12 }),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,11 +92,13 @@ const Lesson2Python = () => {
 
         showLessonCompletion(data.xp_added || 0);
 
-        if (data.new_achievements && data.new_achievements.length > 0) {
-          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        if (data.new_achievements && Array.isArray(data.new_achievements) && data.new_achievements.length > 0) {
+          const message = data.new_achievements
+            .map(a => `Ачивка "${a.name || 'Неизвестная ачивка'}" +${a.xp_reward || 0} XP`)
+            .join('\n');
           setAchievementNotification({
-            message: `Поздравляем!\n${message}`,
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            message,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         }
       } catch (error) {
@@ -109,7 +113,7 @@ const Lesson2Python = () => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
           },
-          body: JSON.stringify({ course_id: 1, lesson_number: 2, repeat: true, xp_reward: 25 }),
+          body: JSON.stringify({ course_id: 1, lesson_number: 12, repeat: true, xp_reward: 25 }),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -120,16 +124,18 @@ const Lesson2Python = () => {
         setRepeatAttempts(1);
         showLessonCompletion(25);
 
-        if (data.new_achievements && data.new_achievements.length > 0) {
-          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        if (data.new_achievements && Array.isArray(data.new_achievements) && data.new_achievements.length > 0) {
+          const message = data.new_achievements
+            .map(a => `Ачивка "${a.name || 'Неизвестная ачивка'}" +${a.xp_reward || 0} XP`)
+            .join('\n');
           setAchievementNotification({
-            message: `Поздравляем!\n${message}`,
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            message,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         } else {
           setAchievementNotification({
             message: 'Повторное прохождение успешно! +25 XP',
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         }
       } catch (error) {
@@ -142,7 +148,7 @@ const Lesson2Python = () => {
   };
 
   const handleNextLesson = () => {
-    navigate('/less3python');
+    navigate('/less13python');
   };
 
   const handleRepeatConfirm = () => {
@@ -161,21 +167,33 @@ const Lesson2Python = () => {
           <ArrowBackIcon />
         </IconButton>
 
-        <h1 className="lesson-title">Урок 2: Переменные и типы данных</h1>
-        <p className='text-prebig'>Что такое переменные?</p>
+        <h1 className="lesson-title">Урок 12: Работа с числами в списках</h1>
+        <p className="text-prebig">Как работать со списками чисел?</p>
         <p>
-          Переменные — это именованные контейнеры для хранения данных.<br /><br />
-          Можно представить переменную как ярлык на коробке, внутри которой лежит информация. Например, ты можешь создать коробку с надписью name, а внутрь положить значение "Имя".<br /><br />
-          Переменные создаются автоматически, когда ты им что-то присваиваешь. Нет необходимости указывать заранее тип данных — Python определяет его автоматически (это называется динамическая типизация).
+          Списки в Python позволяют хранить несколько чисел или других данных. Ты можешь перебирать элементы списка с помощью цикла <code>for</code> и выполнять с ними операции, например, находить их сумму.
         </p>
         <p>
-          В Python переменные используются для хранения данных. Тип переменной зависит от значения, которое ей присваивается.
+          Чтобы найти сумму чисел в списке, создай переменную для суммы (например, <code>total = 0</code>) и добавляй к ней каждое число из списка. Например:
+          <ul>
+            <li><code>numbers = [1, 2, 3, 4, 5]</code> — список чисел.</li>
+            <li><code>for num in numbers:</code> — перебирает каждое число.</li>
+            <li><code>total += num</code> — добавляет число к сумме.</li>
+          </ul>
+          Для списка <code>[1, 2, 3, 4, 5]</code> сумма будет <code>1 + 2 + 3 + 4 + 5 = 15</code>.
         </p>
+        <p>
+          Пример из жизни: если у тебя есть список цен покупок, ты можешь использовать цикл, чтобы посчитать, сколько ты потратил.
+        </p>
+        <ul className="lesson-text">
+          <li><strong>Список</strong>: Хранит числа, например, <code>[1, 2, 3]</code>.</li>
+          <li><strong>for</strong>: Перебирает элементы списка.</li>
+          <li><strong>Применение</strong>: Используй списки и циклы для обработки данных.</li>
+        </ul>
         <p className="lesson-task">
-          Задание: создайте переменную <strong>x</strong> со значением <strong>5</strong> и выведите её с помощью <code>print</code>.
+          Задание: создайте список <code>numbers</code> с числами <code>[1, 2, 3, 4, 5]</code>. Используйте цикл <code>for</code>, чтобы найти сумму чисел, и сохраните её в <code>total</code>. Выведите сумму.
         </p>
 
-        <Button variant="contained" className='button-go-1put' onClick={handleRunCode} sx={{ mt: 2 }}>
+        <Button variant="contained" className="button-go-1put" onClick={handleRunCode} sx={{ mt: 2 }}>
           ▶ Запустить код
         </Button>
         <div className="output-box">
@@ -183,7 +201,7 @@ const Lesson2Python = () => {
         </div>
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-          <Button variant="outlined" className='button-xp-1put' onClick={handleSubmit} sx={{ mt: 0 }}>
+          <Button variant="outlined" className="button-xp-1put" onClick={handleSubmit} sx={{ mt: 0 }}>
             Отправить и получить XP
           </Button>
           {submitted && (
@@ -198,7 +216,7 @@ const Lesson2Python = () => {
                 fontFamily: 'Tektur',
               }}
             >
-              Приступить к уроку 3
+              Приступить к уроку 13
             </Button>
           )}
         </Box>
@@ -233,23 +251,23 @@ const Lesson2Python = () => {
         </DialogActions>
       </Dialog>
 
-      {achievementNotification && (
-        <Snackbar
-          open={true}
-          onClose={() => setAchievementNotification(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          className="achievement-snackbar"
-          style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
-        >
+      <Snackbar
+        open={!!achievementNotification}
+        onClose={() => setAchievementNotification(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        className="achievement-snackbar"
+        style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
+      >
+        {achievementNotification && (
           <Alert severity="success">
             {achievementNotification.message.split('\n').map((line, index) => (
               <div key={index}>{line}</div>
             ))}
           </Alert>
-        </Snackbar>
-      )}
+        )}
+      </Snackbar>
     </div>
   );
 };
 
-export default Lesson2Python;
+export default Lesson12Python;

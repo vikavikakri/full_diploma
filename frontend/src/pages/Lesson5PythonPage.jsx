@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import { Button, IconButton, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, IconButton, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Snackbar, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Editor from '@monaco-editor/react';
+import { ProfileContext } from '../context/ProfileContext';
 import './lesson3python.css';
 
 const Lesson5Python = () => {
@@ -17,7 +18,11 @@ print(result)`);
   const [xp, setXp] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const [repeatAttempts, setRepeatAttempts] = useState(0);
   const [showRepeatModal, setShowRepeatModal] = useState(false);
+  const [achievementNotification, setAchievementNotification] = useState(null);
+  const { showLessonCompletion, showErrorNotification } = useContext(ProfileContext);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,14 +40,12 @@ print(result)`);
         if (pythonCourse && pythonCourse.completed_lessons.includes(5)) {
           setAlreadyCompleted(true);
           setSubmitted(true);
+          const repeatCount = pythonCourse.repeat_attempts || 0;
+          setRepeatAttempts(repeatCount);
         }
       } catch (error) {
         console.error('Ошибка загрузки прогресса:', error.message);
-        if (error.message.includes('404')) {
-          console.error('Сервер не найден. Проверьте, работает ли сервер на http://localhost:5000.');
-        } else if (error.message.includes('401') || error.message.includes('403')) {
-          console.error('Ошибка авторизации. Проверьте токен.');
-        }
+        showErrorNotification('Ошибка загрузки прогресса.');
       }
     };
     fetchProgress();
@@ -53,18 +56,21 @@ print(result)`);
   };
 
   const handleRunCode = async () => {
-    const correctCode = `# Функция для умножения двух чисел
+    try {
+      const correctCode = `# Функция для умножения двух чисел
 def multiply(a, b):
     return a * b
 
 # Вызов функции
 result = multiply(5, 3)
 print(result)`;
-
-    if (code.trim() === correctCode) {
-      setOutput("15");
-    } else {
-      setOutput("Ошибка: попробуйте снова.");
+      if (code.trim() === correctCode) {
+        setOutput("15");
+      } else {
+        setOutput("Ошибка: попробуйте снова.");
+      }
+    } catch (e) {
+      setOutput("Ошибка выполнения");
     }
   };
 
@@ -76,41 +82,82 @@ def multiply(a, b):
 # Вызов функции
 result = multiply(5, 3)
 print(result)`;
+    if (code.trim() !== correctCode) {
+      showErrorNotification('Ошибка: вы неверно решили урок.');
+      return;
+    }
 
-    if (code.trim() === correctCode) {
-      if (alreadyCompleted && !submitted) {
-        setShowRepeatModal(true);
-      } else {
-        try {
-          const response = await fetch('http://localhost:5000/api/progress', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            },
-            body: JSON.stringify({ course_id: 1, lesson_number: 5 }),
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          setXp(data.points);
-          setSubmitted(true);
-          setAlreadyCompleted(true);
-          alert(`Отлично! Вы получили ${data.xp_added} XP.`);
-        } catch (error) {
-          console.error('Ошибка сохранения прогресса:', error.message);
-          if (error.message.includes('404')) {
-            alert('Сервер не найден. Убедитесь, что сервер запущен на http://localhost:5000.');
-          } else if (error.message.includes('401') || error.message.includes('403')) {
-            alert('Ошибка авторизации. Проверьте токен.');
-          } else {
-            alert('Ошибка при сохранении прогресса');
-          }
+    if (alreadyCompleted && !submitted) {
+      setShowRepeatModal(true);
+    } else if (!submitted) {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          },
+          body: JSON.stringify({ course_id: 1, lesson_number: 5 }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        console.log('Response from /api/progress:', data);
+        setXp(data.points);
+        setSubmitted(true);
+        setAlreadyCompleted(true);
+
+        showLessonCompletion(data.xp_added || 0);
+
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+          setAchievementNotification({
+            message: `Поздравляем!\n${message}`,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка сохранения прогресса:', error.message);
+        showErrorNotification('Ошибка сервера при сохранении прогресса.');
+      }
+    } else if (repeatAttempts < 1) {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          },
+          body: JSON.stringify({ course_id: 1, lesson_number: 5, repeat: true, xp_reward: 25 }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Response from /api/progress (repeat):', data);
+        setXp(data.points);
+        setRepeatAttempts(1);
+        showLessonCompletion(25);
+
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+          setAchievementNotification({
+            message: `Поздравляем!\n${message}`,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        } else {
+          setAchievementNotification({
+            message: 'Повторное прохождение успешно! +25 XP',
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка сохранения прогресса (repeat):', error.message);
+        showErrorNotification('Ошибка сервера при сохранении прогресса.');
       }
     } else {
-      alert('Код неверный. Попробуйте снова.');
+      showErrorNotification('Вы уже прошли этот урок.');
     }
   };
 
@@ -118,34 +165,9 @@ print(result)`;
     navigate('/less6python');
   };
 
-  const handleRepeatConfirm = async () => {
+  const handleRepeatConfirm = () => {
     setShowRepeatModal(false);
-    try {
-      const response = await fetch('http://localhost:5000/api/progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
-        },
-        body: JSON.stringify({ course_id: 1, lesson_number: 5 }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setXp(data.points);
-      setSubmitted(true);
-      alert(`Отлично! Вы получили ${data.xp_added} XP.`);
-    } catch (error) {
-      console.error('Ошибка сохранения прогресса:', error.message);
-      if (error.message.includes('404')) {
-        alert('Сервер не найден. Убедитесь, что сервер запущен на http://localhost:5000.');
-      } else if (error.message.includes('401') || error.message.includes('403')) {
-        alert('Ошибка авторизации. Проверьте токен.');
-      } else {
-        alert('Ошибка при сохранении прогресса');
-      }
-    }
+    handleSubmit();
   };
 
   const handleRepeatCancel = () => {
@@ -160,22 +182,19 @@ print(result)`;
         </IconButton>
 
         <h1 className="lesson-title">Урок 5: Функции и модули</h1>
-        <p className='text-prebig'>
-          Что такое функция?
+        <p className='text-prebig'>Что такое функция?</p>
+        <p>
+          Функция — это именованный блок кода, который выполняет определённую задачу и может вызываться множество раз.<br /><br />
+          Представь: ты готовишь чай. Каждый раз ты выполняешь одни и те же действия.<br /> Вместо того, чтобы описывать эти шаги снова и снова, ты создаёшь "функцию" — сделать_чай() — и вызываешь её по мере необходимости.
         </p>
         <p>
-          Функция - это именованный блок кода, который выполняет определённую задачу и может вызываться множество раз.<br></br><br></br>
-          Представь: ты готовишь чай. Каждый раз ты выполняешь одни и те же действия.<br></br> Вместо того, чтобы описывать эти шаги снова и снова, ты создаёшь "функцию" - сделать_чай( ) - и вызываешь её по мере необходимости.
-        </p>
-        <p>
-          В Python функции позволяют повторно использовать код. Вы можете передавать аргументы в функцию и получать значения обратно.<br></br> Модули позволяют организовать код в разные файлы для упрощения и повторного использования.
+          В Python функции позволяют повторно использовать код. Вы можете передавать аргументы в функцию и получать значения обратно.<br /> Модули позволяют организовать код в разные файлы для упрощения и повторного использования.
         </p>
         <ul className="lesson-text">
-          <li><strong>def</strong> - ключевое слово для объявления функции.</li>
-          <li><strong>return</strong> - используется для возврата значения из функции.</li>
+          <li><strong>def</strong> — ключевое слово для объявления функции.</li>
+          <li><strong>return</strong> — используется для возврата значения из функции.</li>
           <li>Модули позволяют организовывать код в разные файлы.</li>
         </ul>
-
         <p className="lesson-task">
           Задание: создайте функцию <code>multiply(a, b)</code>, которая принимает два числа и возвращает их произведение. Затем вызовите её с числами 5 и 3.
         </p>
@@ -237,6 +256,22 @@ print(result)`;
           </Button>
         </DialogActions>
       </Dialog>
+
+      {achievementNotification && (
+        <Snackbar
+          open={true}
+          onClose={() => setAchievementNotification(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          className="achievement-snackbar"
+          style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
+        >
+          <Alert severity="success">
+            {achievementNotification.message.split('\n').map((line, index) => (
+              <div key={index}>{line}</div>
+            ))}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   );
 };

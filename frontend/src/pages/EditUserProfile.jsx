@@ -327,9 +327,15 @@ const EditProfilePage = () => {
                                 Возраст: {calculateAge()}
                             </Typography>
                         </Box>
-                        <FormControl sx={{ minWidth: 120 }}>
-                            <InputLabel>Роль</InputLabel>
-                            <Select value={role} onChange={(e) => setRole(e.target.value)}>
+                        <FormControl>
+                        <InputLabel id="role-label">Роль</InputLabel>
+                            <Select
+                                labelId="role-label"
+                                id="role-select"
+                                value={role}
+                                label="Роль"
+                                onChange={(e) => setRole(e.target.value)}
+                            >
                                 <MenuItem value="Ученик">Ученик</MenuItem>
                                 <MenuItem value="Учитель">Учитель</MenuItem>
                             </Select>
@@ -356,21 +362,7 @@ const EditProfilePage = () => {
                             ))}
                         </FormGroup>
                     </Box>
-                    <Box
-                        sx={{
-                            mt: 3,
-                            bgcolor: '#D7ED93',
-                            p: 2,
-                            borderRadius: '20px',
-                            minHeight: 300,
-                            width: '95%',
-                        }}
-                    >
-                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#374D45', fontFamily: 'Tektur' }}>
-                            Ачивки:
-                        </Typography>
-                        {/* Пока пусто, реализуем позже */}
-                    </Box>
+                    
                     <Button
                         variant="contained"
                         sx={{
@@ -757,7 +749,7 @@ const EditProfilePage = () => {
                         }}
                         onClick={handleCloseModal}
                     >
-                        Закрыть
+                        Сохранить
                     </Button>
                 </Box>
             </Modal>

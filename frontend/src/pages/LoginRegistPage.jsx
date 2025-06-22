@@ -1,15 +1,18 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import './loginreg.css';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TextField, Button, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff, ArrowBack, ArrowForward } from '@mui/icons-material';
 import { ProfileContext } from '../context/ProfileContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { fetchProfile } = useContext(ProfileContext);
+  const formRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'login');
   const [showPassword, setShowPassword] = useState(false);
@@ -33,30 +36,93 @@ const AuthForm = () => {
   }, [location.state]);
 
   const handleBackClick = () => {
-    navigate('/');
+    navigate('/', { replace: true }); // Заменяем историю
   };
 
   const handleForgpassClick = () => {
-    navigate('/forgpass');
+    navigate('/forgpass', { replace: true });
+  };
+
+  const formatPhoneNumber = (value) => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length > 12) return registerData.phone;
+
+    let formatted = digits;
+    if (digits.length > 0) formatted = `(${digits.slice(0, 3)}`;
+    if (digits.length > 3) formatted += `)${digits.slice(3, 6)}`;
+    if (digits.length > 6) formatted += `-${digits.slice(6, 8)}`;
+    if (digits.length > 8) formatted += `-${digits.slice(8, 10)}`;
+    return formatted;
   };
 
   const handleRegister = async () => {
+    const requiredFields = { username: 'Логин', email: 'Email', password: 'Пароль', confirmPassword: 'Подтверждение пароля' };
+    const emptyFields = {};
+    for (const [field, label] of Object.entries(requiredFields)) {
+      if (!registerData[field].trim()) {
+        emptyFields[field] = label;
+      }
+    }
+
+    if (Object.keys(emptyFields).length > 0) {
+      setError(`Заполните следующие поля: ${Object.values(emptyFields).join(', ')}`);
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        Object.keys(emptyFields).forEach(field => {
+          const input = document.querySelector(`input[name="${field}"]`);
+          if (input) {
+            input.style.border = '2px solid red';
+            input.style.borderRadius = '4px';
+            setTimeout(() => {
+              input.style.border = '';
+              input.style.borderRadius = '';
+            }, 2000);
+          }
+        });
+      }
+      return;
+    }
+
     if (registerData.password !== registerData.confirmPassword) {
       setError('Пароли не совпадают');
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const passwordInput = document.querySelector('input[name="password"]');
+        const confirmInput = document.querySelector('input[name="confirmPassword"]');
+        if (passwordInput) {
+          passwordInput.style.border = '2px solid red';
+          passwordInput.style.borderRadius = '4px';
+        }
+        if (confirmInput) {
+          confirmInput.style.border = '2px solid red';
+          confirmInput.style.borderRadius = '4px';
+        }
+        setTimeout(() => {
+          if (passwordInput) {
+            passwordInput.style.border = '';
+            passwordInput.style.borderRadius = '';
+          }
+          if (confirmInput) {
+            confirmInput.style.border = '';
+            confirmInput.style.borderRadius = '';
+          }
+        }, 2000);
+      }
       return;
     }
 
     try {
       const response = await axios.post('http://localhost:5000/api/register', registerData);
       setError('');
-      alert('Регистрация успешна!');
-      setRegisterData({ username: '', email: '', phone: '', password: '', confirmPassword: '' });
+      toast.success('Регистрация успешна! Добро пожаловать!', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
 
-      // После успешной регистрации выполняем вход
-      const loginPayload = {
-        username: registerData.username,
-        password: registerData.password
-      };
+      const loginPayload = { username: registerData.username, password: registerData.password };
       const loginResponse = await axios.post('http://localhost:5000/api/login', loginPayload);
 
       const token = loginResponse.data.token;
@@ -67,10 +133,13 @@ const AuthForm = () => {
       localStorage.setItem('token', token);
 
       await fetchProfile();
-      navigate('/profile'); // Перенаправляем на страницу профиля после регистрации
+      navigate('/profile', { replace: true });
     } catch (error) {
-      console.error('Ошибка при регистрации:', error);
+      console.error('Ошибка при регистрации:', error.response?.data || error.message);
       setError(error.response?.data?.error || 'Ошибка при регистрации');
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
@@ -91,15 +160,18 @@ const AuthForm = () => {
       localStorage.setItem('token', token);
 
       await fetchProfile();
-      navigate('/'); // Перенаправляем на главную страницу после входа
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Ошибка при входе:', error);
       setError(error.response?.data?.error || 'Неверный логин/email или пароль');
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
   return (
-    <div className="auth-container-login">
+    <div className="auth-container-login" ref={formRef}>
       <div className="auth-box-login">
         <IconButton className="back-button-login" onClick={handleBackClick}>
           <ArrowBack />
@@ -121,7 +193,7 @@ const AuthForm = () => {
         </div>
 
         <div className="form-content-login">
-          {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+          {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</p>}
           {activeTab === 'login' ? (
             <>
               <TextField
@@ -154,7 +226,6 @@ const AuthForm = () => {
               <Button variant="contained" className="login-button-login" onClick={handleLogin}>
                 Войти
               </Button>
-
               <Button
                 variant="text"
                 onClick={() => setUseEmailLogin(!useEmailLogin)}
@@ -174,37 +245,44 @@ const AuthForm = () => {
             <>
               <TextField
                 label="Логин"
+                name="username"
                 value={registerData.username}
                 onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
                 variant="outlined"
                 fullWidth
                 className="input-field-login"
                 sx={{ mt: 2 }}
+                required
               />
               <TextField
                 label="Email"
+                name="email"
                 value={registerData.email}
                 onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                 variant="outlined"
                 fullWidth
                 className="input-field-login"
+                required
               />
               <TextField
-                label="Номер телефона"
+                label="Номер телефона (необязательно)"
+                name="phone"
                 value={registerData.phone}
-                onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
+                onChange={(e) => setRegisterData({ ...registerData, phone: formatPhoneNumber(e.target.value) })}
                 variant="outlined"
                 fullWidth
                 className="input-field-login"
               />
               <TextField
                 label="Придумайте пароль"
+                name="password"
                 value={registerData.password}
                 onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                 variant="outlined"
                 type={showPassword ? 'text' : 'password'}
                 fullWidth
                 className="input-field-login"
+                required
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -217,12 +295,14 @@ const AuthForm = () => {
               />
               <TextField
                 label="Повторите пароль"
+                name="confirmPassword"
                 value={registerData.confirmPassword}
                 onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                 variant="outlined"
                 type={showConfirmPassword ? 'text' : 'password'}
                 fullWidth
                 className="input-field-login"
+                required
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">

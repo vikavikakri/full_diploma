@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import { Button, IconButton, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, IconButton, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Snackbar, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Editor from '@monaco-editor/react';
+import { ProfileContext } from '../context/ProfileContext';
 import './lesson3python.css';
 
 const Lesson6Python = () => {
@@ -20,7 +21,11 @@ print("Сумма всех чисел в списке:", total_sum)`);
   const [xp, setXp] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const [repeatAttempts, setRepeatAttempts] = useState(0);
   const [showRepeatModal, setShowRepeatModal] = useState(false);
+  const [achievementNotification, setAchievementNotification] = useState(null);
+  const { showLessonCompletion, showErrorNotification } = useContext(ProfileContext);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,25 +43,24 @@ print("Сумма всех чисел в списке:", total_sum)`);
         if (pythonCourse && pythonCourse.completed_lessons.includes(6)) {
           setAlreadyCompleted(true);
           setSubmitted(true);
+          const repeatCount = pythonCourse.repeat_attempts || 0;
+          setRepeatAttempts(repeatCount);
         }
       } catch (error) {
         console.error('Ошибка загрузки прогресса:', error.message);
-        if (error.message.includes('404')) {
-          console.error('Сервер не найден. Проверьте, работает ли сервер на http://localhost:5000.');
-        } else if (error.message.includes('401') || error.message.includes('403')) {
-          console.error('Ошибка авторизации. Проверьте токен.');
-        }
+        showErrorNotification('Ошибка загрузки прогресса.');
       }
     };
     fetchProgress();
   }, []);
 
   const handleBackClick = () => {
-    navigate(-1);
+    navigate('/python');
   };
 
   const handleRunCode = async () => {
-    const correctCode = `# Список чисел
+    try {
+      const correctCode = `# Список чисел
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 # Нахождение четных чисел
@@ -66,11 +70,13 @@ print("Четные числа:", even_numbers)
 # Сумма всех чисел
 total_sum = sum(numbers)
 print("Сумма всех чисел в списке:", total_sum)`;
-
-    if (code.trim() === correctCode) {
-      setOutput("Четные числа: [2, 4, 6, 8, 10]\nСумма всех чисел в списке: 55");
-    } else {
-      setOutput("Ошибка: попробуйте снова.");
+      if (code.trim() === correctCode) {
+        setOutput("Четные числа: [2, 4, 6, 8, 10]\nСумма всех чисел в списке: 55");
+      } else {
+        setOutput("Ошибка: попробуйте снова.");
+      }
+    } catch (e) {
+      setOutput("Ошибка выполнения");
     }
   };
 
@@ -85,77 +91,101 @@ print("Четные числа:", even_numbers)
 # Сумма всех чисел
 total_sum = sum(numbers)
 print("Сумма всех чисел в списке:", total_sum)`;
+    if (code.trim() !== correctCode) {
+      showErrorNotification('Ошибка: вы неверно решили урок.');
+      return;
+    }
 
-    if (code.trim() === correctCode) {
-      if (alreadyCompleted && !submitted) {
-        setShowRepeatModal(true);
-      } else {
-        try {
-          const response = await fetch('http://localhost:5000/api/progress', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            },
-            body: JSON.stringify({ course_id: 1, lesson_number: 6 }),
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          setXp(data.points);
-          setSubmitted(true);
-          setAlreadyCompleted(true);
-          alert(`Отлично! Вы получили ${data.xp_added} XP.`);
-        } catch (error) {
-          console.error('Ошибка сохранения прогресса:', error.message);
-          if (error.message.includes('404')) {
-            alert('Сервер не найден. Убедитесь, что сервер запущен на http://localhost:5000.');
-          } else if (error.message.includes('401') || error.message.includes('403')) {
-            alert('Ошибка авторизации. Проверьте токен.');
-          } else {
-            alert('Ошибка при сохранении прогресса');
-          }
+    if (alreadyCompleted && !submitted) {
+      setShowRepeatModal(true);
+    } else if (!submitted) {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          },
+          body: JSON.stringify({ course_id: 1, lesson_number: 6 }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        console.log('Response from /api/progress:', data);
+        setXp(data.points);
+        setSubmitted(true);
+        setAlreadyCompleted(true);
+
+        showLessonCompletion(data.xp_added || 0);
+
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+          setAchievementNotification({
+            message: `Поздравляем!\n${message}`,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка сохранения прогресса:', error.message);
+        showErrorNotification('Ошибка сервера при сохранении прогресса.');
+      }
+    } else if (repeatAttempts < 1) {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          },
+          body: JSON.stringify({ course_id: 1, lesson_number: 6, repeat: true, xp_reward: 25 }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Response from /api/progress (repeat):', data);
+        setXp(data.points);
+        setRepeatAttempts(1);
+        showLessonCompletion(25);
+
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+          setAchievementNotification({
+            message: `Поздравляем!\n${message}`,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        } else {
+          setAchievementNotification({
+            message: 'Повторное прохождение успешно! +25 XP',
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка сохранения прогресса (repeat):', error.message);
+        showErrorNotification('Ошибка сервера при сохранении прогресса.');
       }
     } else {
-      alert('Код неверный. Попробуйте снова.');
+      showErrorNotification('Вы уже прошли этот урок.');
     }
   };
 
+  const handleNextLesson = () => {
+    navigate('/less7python');
+  };
+
+
   const handleCourseComplete = () => {
-    alert('Поздравляем! Вы завершили курс Python!');
+    setAchievementNotification({
+      message: 'Поздравляем! Вы завершили курс Python!',
+      timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+    });
     navigate('/python');
   };
 
-  const handleRepeatConfirm = async () => {
+  const handleRepeatConfirm = () => {
     setShowRepeatModal(false);
-    try {
-      const response = await fetch('http://localhost:5000/api/progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
-        },
-        body: JSON.stringify({ course_id: 1, lesson_number: 6 }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setXp(data.points);
-      setSubmitted(true);
-      alert(`Отлично! Вы получили ${data.xp_added} XP.`);
-    } catch (error) {
-      console.error('Ошибка сохранения прогресса:', error.message);
-      if (error.message.includes('404')) {
-        alert('Сервер не найден. Убедитесь, что сервер запущен на http://localhost:5000.');
-      } else if (error.message.includes('401') || error.message.includes('403')) {
-        alert('Ошибка авторизации. Проверьте токен.');
-      } else {
-        alert('Ошибка при сохранении прогресса');
-      }
-    }
+    handleSubmit();
   };
 
   const handleRepeatCancel = () => {
@@ -170,11 +200,9 @@ print("Сумма всех чисел в списке:", total_sum)`;
         </IconButton>
 
         <h1 className="lesson-title">Урок 6: Списки и циклы</h1>
-        <p className='text-prebig'>
-          Что такое список?
-        </p>
+        <p className='text-prebig'>Что такое список?</p>
         <p>
-          Список (list) — это упорядоченная коллекция значений, которые могут быть изменены.<br></br> Списки в Python обозначаются квадратными скобками [ ].
+          Список (list) — это упорядоченная коллекция значений, которые могут быть изменены.<br /> Списки в Python обозначаются квадратными скобками [ ].
         </p>
         <p>
           Списки — это коллекции элементов в Python, которые могут содержать любые типы данных. Циклы позволяют перебирать элементы списка и выполнять действия с каждым элементом.
@@ -184,7 +212,6 @@ print("Сумма всех чисел в списке:", total_sum)`;
           <li><strong>Цикл for</strong> — для перебора всех элементов списка.</li>
           <li><strong>Условие</strong> — для фильтрации элементов в цикле.</li>
         </ul>
-
         <p className="lesson-task">
           Задание: создайте список чисел от 1 до 10, затем найдите все чётные числа в списке и вычислите сумму всех чисел.
         </p>
@@ -203,7 +230,7 @@ print("Сумма всех чисел в списке:", total_sum)`;
           {submitted && (
             <Button
               variant="outlined"
-              onClick={handleCourseComplete}
+              onClick={handleNextLesson}
               sx={{
                 backgroundColor: '#ffd54f',
                 borderRadius: '8px',
@@ -212,7 +239,7 @@ print("Сумма всех чисел в списке:", total_sum)`;
                 fontFamily: 'Tektur',
               }}
             >
-              Завершить курс
+              Приступить к уроку 7
             </Button>
           )}
         </Box>
@@ -246,6 +273,22 @@ print("Сумма всех чисел в списке:", total_sum)`;
           </Button>
         </DialogActions>
       </Dialog>
+
+      {achievementNotification && (
+        <Snackbar
+          open={true}
+          onClose={() => setAchievementNotification(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          className="achievement-snackbar"
+          style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
+        >
+          <Alert severity="success">
+            {achievementNotification.message.split('\n').map((line, index) => (
+              <div key={index}>{line}</div>
+            ))}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   );
 };

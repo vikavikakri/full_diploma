@@ -6,8 +6,8 @@ import Editor from '@monaco-editor/react';
 import { ProfileContext } from '../context/ProfileContext';
 import './lesson3python.css';
 
-const Lesson2Python = () => {
-  const [code, setCode] = useState("x = \nprint(x)");
+const Lesson9Python = () => {
+  const [code, setCode] = useState("name = input()\ngreeting = \nprint(greeting)");
   const [output, setOutput] = useState('');
   const [xp, setXp] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -31,7 +31,7 @@ const Lesson2Python = () => {
         const data = await response.json();
         setXp(data.points || 0);
         const pythonCourse = data.active_courses.find(course => course.course_id === 1);
-        if (pythonCourse && pythonCourse.completed_lessons.includes(2)) {
+        if (pythonCourse && pythonCourse.completed_lessons.includes(9)) {
           setAlreadyCompleted(true);
           setSubmitted(true);
           const repeatCount = pythonCourse.repeat_attempts || 0;
@@ -51,8 +51,9 @@ const Lesson2Python = () => {
 
   const handleRunCode = async () => {
     try {
-      if (code.trim() === "x = 5\nprint(x)") {
-        setOutput("5");
+      const correctCode = "name = input()\ngreeting = 'Привет, ' + name + '!'\nprint(greeting)";
+      if (code.trim() === correctCode) {
+        setOutput("Привет, Алекс!");
       } else {
         setOutput("Ошибка: попробуйте снова.");
       }
@@ -62,7 +63,8 @@ const Lesson2Python = () => {
   };
 
   const handleSubmit = async () => {
-    if (code.trim() !== "x = 5\nprint(x)") {
+    const correctCode = "name = input()\ngreeting = 'Привет, ' + name + '!'\nprint(greeting)";
+    if (code.trim() !== correctCode) {
       showErrorNotification('Ошибка: вы неверно решили урок.');
       return;
     }
@@ -77,7 +79,7 @@ const Lesson2Python = () => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
           },
-          body: JSON.stringify({ course_id: 1, lesson_number: 2 }),
+          body: JSON.stringify({ course_id: 1, lesson_number: 9 }),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,11 +92,13 @@ const Lesson2Python = () => {
 
         showLessonCompletion(data.xp_added || 0);
 
-        if (data.new_achievements && data.new_achievements.length > 0) {
-          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        if (data.new_achievements && Array.isArray(data.new_achievements) && data.new_achievements.length > 0) {
+          const message = data.new_achievements
+            .map(a => `Ачивка "${a.name || 'Неизвестная ачивка'}" +${a.xp_reward || 0} XP`)
+            .join('\n');
           setAchievementNotification({
-            message: `Поздравляем!\n${message}`,
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            message,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         }
       } catch (error) {
@@ -109,7 +113,7 @@ const Lesson2Python = () => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
           },
-          body: JSON.stringify({ course_id: 1, lesson_number: 2, repeat: true, xp_reward: 25 }),
+          body: JSON.stringify({ course_id: 1, lesson_number: 9, repeat: true, xp_reward: 25 }),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -120,16 +124,18 @@ const Lesson2Python = () => {
         setRepeatAttempts(1);
         showLessonCompletion(25);
 
-        if (data.new_achievements && data.new_achievements.length > 0) {
-          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        if (data.new_achievements && Array.isArray(data.new_achievements) && data.new_achievements.length > 0) {
+          const message = data.new_achievements
+            .map(a => `Ачивка "${a.name || 'Неизвестная ачивка'}" +${a.xp_reward || 0} XP`)
+            .join('\n');
           setAchievementNotification({
-            message: `Поздравляем!\n${message}`,
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            message,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         } else {
           setAchievementNotification({
             message: 'Повторное прохождение успешно! +25 XP',
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         }
       } catch (error) {
@@ -142,7 +148,7 @@ const Lesson2Python = () => {
   };
 
   const handleNextLesson = () => {
-    navigate('/less3python');
+    navigate('/less10python');
   };
 
   const handleRepeatConfirm = () => {
@@ -161,21 +167,32 @@ const Lesson2Python = () => {
           <ArrowBackIcon />
         </IconButton>
 
-        <h1 className="lesson-title">Урок 2: Переменные и типы данных</h1>
-        <p className='text-prebig'>Что такое переменные?</p>
+        <h1 className="lesson-title">Урок 9: Ввод пользователя</h1>
+        <p className="text-prebig">Как получить данные от пользователя?</p>
         <p>
-          Переменные — это именованные контейнеры для хранения данных.<br /><br />
-          Можно представить переменную как ярлык на коробке, внутри которой лежит информация. Например, ты можешь создать коробку с надписью name, а внутрь положить значение "Имя".<br /><br />
-          Переменные создаются автоматически, когда ты им что-то присваиваешь. Нет необходимости указывать заранее тип данных — Python определяет его автоматически (это называется динамическая типизация).
+          В Python ты можешь взаимодействовать с пользователем, запрашивая данные с помощью функции <code>input()</code>. Эта функция позволяет пользователю ввести текст, который программа может использовать. Например, ты можешь спросить имя и поздороваться!
         </p>
         <p>
-          В Python переменные используются для хранения данных. Тип переменной зависит от значения, которое ей присваивается.
+          Функция <code>input()</code> возвращает строку, которую пользователь ввёл. Ты можешь сохранить эту строку в переменную и использовать её. Например:
+          <ul>
+            <li>Код: <code>name = input()</code> — ждёт, пока пользователь введёт текст и нажмёт Enter.</li>
+            <li>Если пользователь ввёл <code>Алекс</code>, переменная <code>name</code> станет строкой <code>'Алекс'</code>.</li>
+          </ul>
+          Чтобы создать приветствие, ты можешь соединить строки с помощью оператора <code>+</code>. Например: <code>'Привет, ' + name + '!'</code>.
         </p>
+        <p>
+          Пример из жизни: представь, что ты пишешь чат-бота, который спрашивает имя пользователя и отвечает <code>Привет, Алекс!</code>. Это первый шаг к созданию интерактивных программ!
+        </p>
+        <ul className="lesson-text">
+          <li><strong>input()</strong>: Запрашивает текст от пользователя и возвращает строку.</li>
+          <li><strong>Конкатенация</strong>: Соединение строк с помощью <code>+</code>.</li>
+          <li><strong>Применение</strong>: Используй <code>input()</code> для взаимодействия с пользователем.</li>
+        </ul>
         <p className="lesson-task">
-          Задание: создайте переменную <strong>x</strong> со значением <strong>5</strong> и выведите её с помощью <code>print</code>.
+          Задание: используйте <code>input()</code>, чтобы запросить имя пользователя и сохранить его в переменную <code>name</code>. Создайте строку <code>greeting</code> в формате <code>Привет, [имя]!</code>, соединив строки. Выведите приветствие.
         </p>
 
-        <Button variant="contained" className='button-go-1put' onClick={handleRunCode} sx={{ mt: 2 }}>
+        <Button variant="contained" className="button-go-1put" onClick={handleRunCode} sx={{ mt: 2 }}>
           ▶ Запустить код
         </Button>
         <div className="output-box">
@@ -183,7 +200,7 @@ const Lesson2Python = () => {
         </div>
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-          <Button variant="outlined" className='button-xp-1put' onClick={handleSubmit} sx={{ mt: 0 }}>
+          <Button variant="outlined" className="button-xp-1put" onClick={handleSubmit} sx={{ mt: 0 }}>
             Отправить и получить XP
           </Button>
           {submitted && (
@@ -198,7 +215,7 @@ const Lesson2Python = () => {
                 fontFamily: 'Tektur',
               }}
             >
-              Приступить к уроку 3
+              Приступить к уроку 10
             </Button>
           )}
         </Box>
@@ -233,23 +250,23 @@ const Lesson2Python = () => {
         </DialogActions>
       </Dialog>
 
-      {achievementNotification && (
-        <Snackbar
-          open={true}
-          onClose={() => setAchievementNotification(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          className="achievement-snackbar"
-          style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
-        >
+      <Snackbar
+        open={!!achievementNotification}
+        onClose={() => setAchievementNotification(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        className="achievement-snackbar"
+        style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
+      >
+        {achievementNotification && (
           <Alert severity="success">
             {achievementNotification.message.split('\n').map((line, index) => (
               <div key={index}>{line}</div>
             ))}
           </Alert>
-        </Snackbar>
-      )}
+        )}
+      </Snackbar>
     </div>
   );
 };
 
-export default Lesson2Python;
+export default Lesson9Python;

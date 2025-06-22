@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Chip, Grid, IconButton, Paper, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Typography, Button, Chip, Grid, IconButton, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ProfileContext } from '../context/ProfileContext';
 import Avataaars from 'awesome-react-avataaars';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { profile, isLoading } = useContext(ProfileContext);
+  const { profile, isLoading, fetchProfile } = useContext(ProfileContext);
   const [showEditPrompt, setShowEditPrompt] = useState(false);
   const [activeCourses, setActiveCourses] = useState([]);
   const [xp, setXp] = useState(0);
+  const [achievementNotification, setAchievementNotification] = useState(null);
 
   useEffect(() => {
-    const fetchProgress = async () => {
+    const fetchData = async () => {
+      await fetchProfile();
       try {
         const response = await fetch('http://localhost:5000/api/progress', {
           headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
@@ -24,28 +26,42 @@ const ProfilePage = () => {
         const data = await response.json();
         setActiveCourses(data.active_courses || []);
         setXp(data.points || 0);
+
+        // Проверка ачивок после загрузки данных
+        if (profile && Array.isArray(profile.achievements) && profile.achievements.length > 0) {
+          const newbieAchievement = profile.achievements.find(a => a.id === 1); // "Новичок на борту"
+          if (newbieAchievement && !localStorage.getItem('isFirstAchievementNotified')) {
+            setAchievementNotification({
+              id: newbieAchievement.id,
+              name: newbieAchievement.name,
+              xp: newbieAchievement.xp_reward,
+            });
+            localStorage.setItem('isFirstAchievementNotified', 'true');
+          }
+        }
       } catch (error) {
         console.error('Ошибка загрузки прогресса:', error.message);
       }
     };
 
     if (profile) {
-      fetchProgress();
+      fetchData();
     }
 
-    const isFirstVisit = localStorage.getItem('isFirstProfileVisit');
-    if (!isFirstVisit && profile) {
+    // Показать подсказку редактирования при первом посещении
+    const isFirstVisit = !localStorage.getItem('isFirstProfileVisit');
+    if (isFirstVisit && profile) {
       setShowEditPrompt(true);
       localStorage.setItem('isFirstProfileVisit', 'true');
     }
-  }, [profile]);
+  }, [profile, fetchProfile]);
 
   const handleBackClick = () => {
     navigate('/');
   };
 
   const calculateAge = () => {
-    if (!profile?.birth_date) return 'Не указан';
+    if (!profile?.birth_date) return 'Возраст не указан';
     const today = new Date();
     const birth = new Date(profile.birth_date);
     const age = today.getFullYear() - birth.getFullYear();
@@ -54,6 +70,10 @@ const ProfilePage = () => {
       return `${age - 1} лет`;
     }
     return `${age} лет`;
+  };
+
+  const handleCloseNotification = () => {
+    setAchievementNotification(null);
   };
 
   if (isLoading) {
@@ -181,13 +201,19 @@ const ProfilePage = () => {
               Навыки:
             </Typography>
             <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {profile.skills.map((skill) => (
-                <Chip
-                  key={skill}
-                  label={skill}
-                  sx={{ bgcolor: '#E3F0A0', fontWeight: 'bold', fontFamily: 'Tektur' }}
-                />
-              ))}
+              {profile.skills.length > 0 ? (
+                profile.skills.map((skill) => (
+                  <Chip
+                    key={skill}
+                    label={skill}
+                    sx={{ bgcolor: '#E3F0A0', fontWeight: 'bold', fontFamily: 'Tektur' }}
+                  />
+                ))
+              ) : (
+                <Typography variant="body2" sx={{ color: '#374D45', fontFamily: 'Tektur' }}>
+                  Навыков пока нет
+                </Typography>
+              )}
             </Box>
           </Box>
           <Box sx={{ mt: 3, display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
@@ -205,13 +231,19 @@ const ProfilePage = () => {
               </Typography>
               {activeCourses.length > 0 ? (
                 activeCourses.map((course, index) => (
-                  <Box key={index}>
-                    <Typography variant="body2" sx={{ color: '#D7ED93', fontFamily: 'Tektur' }}>
-                      {course.name || `Курс ${course.course_id}`}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#D7ED93', fontFamily: 'Tektur' }}>
-                      {course.progress || '0'}%
-                    </Typography>
+                  <Box key={index} sx={{ mb: 1 }}>
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid item xs>
+                        <Typography variant="body2" sx={{ color: '#D7ED93', fontFamily: 'Tektur' }}>
+                          {course.name || `Курс ${course.course_id}`}
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Typography variant="body2" sx={{ color: '#D7ED93', fontFamily: 'Tektur', mr: 6 }}>
+                          {Math.min(course.progress || 0, 100)}%
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </Box>
                 ))
               ) : (
@@ -252,8 +284,12 @@ const ProfilePage = () => {
             </Typography>
             {Array.isArray(profile.achievements) && profile.achievements.length > 0 ? (
               profile.achievements.map((achievement, index) => (
-                <Typography key={index} variant="body2" sx={{ color: '#374D45', fontFamily: 'Tektur' }}>
-                  {achievement}
+                <Typography
+                  key={index}
+                  variant="body2"
+                  sx={{ color: '#374D45', fontFamily: 'Tektur', display: 'block' }}
+                >
+                  {achievement.name} (+{achievement.xp_reward} XP)
                 </Typography>
               ))
             ) : (
@@ -301,6 +337,23 @@ const ProfilePage = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Уведомление о новой ачивке */}
+      <Snackbar
+        open={!!achievementNotification}
+        autoHideDuration={5000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        sx={{ position: 'fixed', bottom: 20, right: 20 }}
+      >
+        <Alert
+          onClose={handleCloseNotification}
+          severity="success"
+          sx={{ width: '100%', bgcolor: '#edf7ed', color: '#374D45', fontFamily: 'Tektur' }}
+        >
+          Новая ачивка: {achievementNotification?.name} (+{achievementNotification?.xp} XP)!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

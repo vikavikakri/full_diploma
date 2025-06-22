@@ -28,7 +28,7 @@ const CoursePage = () => {
           Курс Математической грамотности
         </Typography>
         <Typography variant="body1" className="course-lessons-matgram" sx={{ fontFamily: 'Tektur, sans-serif' }}>
-          6 уроков
+          11 уроков
         </Typography>
       </Box>
 
@@ -48,12 +48,17 @@ const CoursePage = () => {
 <div className="lessons-container-matgram">
   <div className="lesson-buttons-wrapper">
     {[
-      { number: 1, title: "Числа и арифметические действия" },
-      { number: 2, title: "Проценты, пропорции и доли" },
-      { number: 3, title: "Единицы измерения и формулы" },
-      { number: 4, title: "Таблицы, диаграммы и графики" },
-      { number: 5, title: "Логика и текстовые задачи" },
-      { number: 6, title: "Итоговый разбор + тренировочный тест" },
+      { number: 1, title: "Функция, ее свойства и график" },
+      { number: 2, title: "Тригонометрические функции" },
+      { number: 3, title: "Многочлены" },
+      { number: 4, title: "Степени и корни, степенная функция" },
+      { number: 5, title: "Показательная и логарифмическая функции" },
+      { number: 6, title: "Производная и её применение" },
+      { number: 7, title: "Первообразная функции и интеграл" },
+      { number: 8, title: "Комплексные числа" },
+      { number: 9, title: "Дифференциальные уравнения" },
+      { number: 10, title: "Тела вращения и их элементы" },
+      { number: 11, title: "Объемы тел" },
     ].map((lesson) => (
       <button key={lesson.number} className="lesson-button-matgram" onClick={() => handleLessonClick(lesson.number)}>
         <strong>Урок {lesson.number}.</strong>&nbsp;&nbsp;{lesson.title}

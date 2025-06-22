@@ -6,8 +6,8 @@ import Editor from '@monaco-editor/react';
 import { ProfileContext } from '../context/ProfileContext';
 import './lesson3python.css';
 
-const Lesson2Python = () => {
-  const [code, setCode] = useState("x = \nprint(x)");
+const Lesson11Python = () => {
+  const [code, setCode] = useState("def square(num):\n    return \nresult = square(5)\nprint(result)");
   const [output, setOutput] = useState('');
   const [xp, setXp] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -31,7 +31,7 @@ const Lesson2Python = () => {
         const data = await response.json();
         setXp(data.points || 0);
         const pythonCourse = data.active_courses.find(course => course.course_id === 1);
-        if (pythonCourse && pythonCourse.completed_lessons.includes(2)) {
+        if (pythonCourse && pythonCourse.completed_lessons.includes(11)) {
           setAlreadyCompleted(true);
           setSubmitted(true);
           const repeatCount = pythonCourse.repeat_attempts || 0;
@@ -51,8 +51,9 @@ const Lesson2Python = () => {
 
   const handleRunCode = async () => {
     try {
-      if (code.trim() === "x = 5\nprint(x)") {
-        setOutput("5");
+      const correctCode = "def square(num):\n    return num * num\nresult = square(5)\nprint(result)";
+      if (code.trim() === correctCode) {
+        setOutput("25");
       } else {
         setOutput("Ошибка: попробуйте снова.");
       }
@@ -62,7 +63,8 @@ const Lesson2Python = () => {
   };
 
   const handleSubmit = async () => {
-    if (code.trim() !== "x = 5\nprint(x)") {
+    const correctCode = "def square(num):\n    return num * num\nresult = square(5)\nprint(result)";
+    if (code.trim() !== correctCode) {
       showErrorNotification('Ошибка: вы неверно решили урок.');
       return;
     }
@@ -77,7 +79,7 @@ const Lesson2Python = () => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
           },
-          body: JSON.stringify({ course_id: 1, lesson_number: 2 }),
+          body: JSON.stringify({ course_id: 1, lesson_number: 11 }),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,11 +92,13 @@ const Lesson2Python = () => {
 
         showLessonCompletion(data.xp_added || 0);
 
-        if (data.new_achievements && data.new_achievements.length > 0) {
-          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        if (data.new_achievements && Array.isArray(data.new_achievements) && data.new_achievements.length > 0) {
+          const message = data.new_achievements
+            .map(a => `Ачивка "${a.name || 'Неизвестная ачивка'}" +${a.xp_reward || 0} XP`)
+            .join('\n');
           setAchievementNotification({
-            message: `Поздравляем!\n${message}`,
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            message,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         }
       } catch (error) {
@@ -109,7 +113,7 @@ const Lesson2Python = () => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
           },
-          body: JSON.stringify({ course_id: 1, lesson_number: 2, repeat: true, xp_reward: 25 }),
+          body: JSON.stringify({ course_id: 1, lesson_number: 11, repeat: true, xp_reward: 25 }),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -120,16 +124,18 @@ const Lesson2Python = () => {
         setRepeatAttempts(1);
         showLessonCompletion(25);
 
-        if (data.new_achievements && data.new_achievements.length > 0) {
-          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        if (data.new_achievements && Array.isArray(data.new_achievements) && data.new_achievements.length > 0) {
+          const message = data.new_achievements
+            .map(a => `Ачивка "${a.name || 'Неизвестная ачивка'}" +${a.xp_reward || 0} XP`)
+            .join('\n');
           setAchievementNotification({
-            message: `Поздравляем!\n${message}`,
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            message,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         } else {
           setAchievementNotification({
             message: 'Повторное прохождение успешно! +25 XP',
-            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000),
           });
         }
       } catch (error) {
@@ -142,7 +148,7 @@ const Lesson2Python = () => {
   };
 
   const handleNextLesson = () => {
-    navigate('/less3python');
+    navigate('/less12python');
   };
 
   const handleRepeatConfirm = () => {
@@ -161,21 +167,33 @@ const Lesson2Python = () => {
           <ArrowBackIcon />
         </IconButton>
 
-        <h1 className="lesson-title">Урок 2: Переменные и типы данных</h1>
-        <p className='text-prebig'>Что такое переменные?</p>
+        <h1 className="lesson-title">Урок 11: Простые функции</h1>
+        <p className="text-prebig">Что такое функции?</p>
         <p>
-          Переменные — это именованные контейнеры для хранения данных.<br /><br />
-          Можно представить переменную как ярлык на коробке, внутри которой лежит информация. Например, ты можешь создать коробку с надписью name, а внутрь положить значение "Имя".<br /><br />
-          Переменные создаются автоматически, когда ты им что-то присваиваешь. Нет необходимости указывать заранее тип данных — Python определяет его автоматически (это называется динамическая типизация).
+          Функции в Python — это способ упаковать код, чтобы использовать его многократно. Ты можешь создать функцию, которая выполняет определённую задачу, и вызывать её с разными данными. Например, функция может вычислять квадрат числа.
         </p>
         <p>
-          В Python переменные используются для хранения данных. Тип переменной зависит от значения, которое ей присваивается.
+          Чтобы создать функцию, используй ключевое слово <code>def</code>, название функции и параметры в скобках. Например:
+          <ul>
+            <li><code>def square(num):</code> — создаёт функцию <code>square</code> с параметром <code>num</code>.</li>
+            <li><code>return num * num</code> — возвращает результат (квадрат числа).</li>
+            <li><code>result = square(5)</code> — вызывает функцию и сохраняет результат.</li>
+          </ul>
+          Функция <code>square(5)</code> вернёт <code>25</code>, потому что <code>5 * 5 = 25</code>.
         </p>
+        <p>
+          Пример из жизни: если ты часто вычисляешь квадраты чисел для расчёта площади квадрата, функция <code>square</code> сэкономит тебе время.
+        </p>
+        <ul className="lesson-text">
+          <li><strong>def</strong>: Создаёт функцию.</li>
+          <li><strong>return</strong>: Возвращает результат.</li>
+          <li><strong>Применение</strong>: Используй функции для повторяющихся задач.</li>
+        </ul>
         <p className="lesson-task">
-          Задание: создайте переменную <strong>x</strong> со значением <strong>5</strong> и выведите её с помощью <code>print</code>.
+          Задание: создайте функцию <code>square</code>, которая принимает число <code>num</code> и возвращает его квадрат (<code>num * num</code>). Вызовите функцию с числом <code>5</code> и выведите результат.
         </p>
 
-        <Button variant="contained" className='button-go-1put' onClick={handleRunCode} sx={{ mt: 2 }}>
+        <Button variant="contained" className="button-go-1put" onClick={handleRunCode} sx={{ mt: 2 }}>
           ▶ Запустить код
         </Button>
         <div className="output-box">
@@ -183,7 +201,7 @@ const Lesson2Python = () => {
         </div>
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-          <Button variant="outlined" className='button-xp-1put' onClick={handleSubmit} sx={{ mt: 0 }}>
+          <Button variant="outlined" className="button-xp-1put" onClick={handleSubmit} sx={{ mt: 0 }}>
             Отправить и получить XP
           </Button>
           {submitted && (
@@ -198,7 +216,7 @@ const Lesson2Python = () => {
                 fontFamily: 'Tektur',
               }}
             >
-              Приступить к уроку 3
+              Приступить к уроку 12
             </Button>
           )}
         </Box>
@@ -233,23 +251,23 @@ const Lesson2Python = () => {
         </DialogActions>
       </Dialog>
 
-      {achievementNotification && (
-        <Snackbar
-          open={true}
-          onClose={() => setAchievementNotification(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          className="achievement-snackbar"
-          style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
-        >
+      <Snackbar
+        open={!!achievementNotification}
+        onClose={() => setAchievementNotification(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        className="achievement-snackbar"
+        style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
+      >
+        {achievementNotification && (
           <Alert severity="success">
             {achievementNotification.message.split('\n').map((line, index) => (
               <div key={index}>{line}</div>
             ))}
           </Alert>
-        </Snackbar>
-      )}
+        )}
+      </Snackbar>
     </div>
   );
 };
 
-export default Lesson2Python;
+export default Lesson11Python;

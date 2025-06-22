@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import { Button, IconButton, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, IconButton, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Snackbar, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Editor from '@monaco-editor/react';
+import { ProfileContext } from '../context/ProfileContext';
 import './lesson3python.css';
 
 const Lesson4Python = () => {
@@ -11,7 +12,11 @@ const Lesson4Python = () => {
   const [xp, setXp] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const [repeatAttempts, setRepeatAttempts] = useState(0);
   const [showRepeatModal, setShowRepeatModal] = useState(false);
+  const [achievementNotification, setAchievementNotification] = useState(null);
+  const { showLessonCompletion, showErrorNotification } = useContext(ProfileContext);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,14 +34,12 @@ const Lesson4Python = () => {
         if (pythonCourse && pythonCourse.completed_lessons.includes(4)) {
           setAlreadyCompleted(true);
           setSubmitted(true);
+          const repeatCount = pythonCourse.repeat_attempts || 0;
+          setRepeatAttempts(repeatCount);
         }
       } catch (error) {
         console.error('Ошибка загрузки прогресса:', error.message);
-        if (error.message.includes('404')) {
-          console.error('Сервер не найден. Проверьте, работает ли сервер на http://localhost:5000.');
-        } else if (error.message.includes('401') || error.message.includes('403')) {
-          console.error('Ошибка авторизации. Проверьте токен.');
-        }
+        showErrorNotification('Ошибка загрузки прогресса.');
       }
     };
     fetchProgress();
@@ -47,50 +50,96 @@ const Lesson4Python = () => {
   };
 
   const handleRunCode = async () => {
-    const correctCode = "for i in range(5):\n    print(i)";
-    if (code.trim() === correctCode) {
-      setOutput("0\n1\n2\n3\n4");
-    } else {
-      setOutput("Ошибка: попробуйте снова.");
+    try {
+      const correctCode = "for i in range(5):\n    print(i)";
+      if (code.trim() === correctCode) {
+        setOutput("0\n1\n2\n3\n4");
+      } else {
+        setOutput("Ошибка: попробуйте снова.");
+      }
+    } catch (e) {
+      setOutput("Ошибка выполнения");
     }
   };
 
   const handleSubmit = async () => {
     const correctCode = "for i in range(5):\n    print(i)";
-    if (code.trim() === correctCode) {
-      if (alreadyCompleted && !submitted) {
-        setShowRepeatModal(true);
-      } else {
-        try {
-          const response = await fetch('http://localhost:5000/api/progress', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            },
-            body: JSON.stringify({ course_id: 1, lesson_number: 4 }),
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          setXp(data.points);
-          setSubmitted(true);
-          setAlreadyCompleted(true);
-          alert(`Отлично! Вы получили ${data.xp_added} XP.`);
-        } catch (error) {
-          console.error('Ошибка сохранения прогресса:', error.message);
-          if (error.message.includes('404')) {
-            alert('Сервер не найден. Убедитесь, что сервер запущен на http://localhost:5000.');
-          } else if (error.message.includes('401') || error.message.includes('403')) {
-            alert('Ошибка авторизации. Проверьте токен.');
-          } else {
-            alert('Ошибка при сохранении прогресса');
-          }
+    if (code.trim() !== correctCode) {
+      showErrorNotification('Ошибка: вы неверно решили урок.');
+      return;
+    }
+
+    if (alreadyCompleted && !submitted) {
+      setShowRepeatModal(true);
+    } else if (!submitted) {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          },
+          body: JSON.stringify({ course_id: 1, lesson_number: 4 }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        console.log('Response from /api/progress:', data);
+        setXp(data.points);
+        setSubmitted(true);
+        setAlreadyCompleted(true);
+
+        showLessonCompletion(data.xp_added || 0);
+
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+          setAchievementNotification({
+            message: `Поздравляем!\n${message}`,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка сохранения прогресса:', error.message);
+        showErrorNotification('Ошибка сервера при сохранении прогресса.');
+      }
+    } else if (repeatAttempts < 1) {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          },
+          body: JSON.stringify({ course_id: 1, lesson_number: 4, repeat: true, xp_reward: 25 }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Response from /api/progress (repeat):', data);
+        setXp(data.points);
+        setRepeatAttempts(1);
+        showLessonCompletion(25);
+
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const message = data.new_achievements.map(a => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+          setAchievementNotification({
+            message: `Поздравляем!\n${message}`,
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        } else {
+          setAchievementNotification({
+            message: 'Повторное прохождение успешно! +25 XP',
+            timeoutId: setTimeout(() => setAchievementNotification(null), 5000)
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка сохранения прогресса (repeat):', error.message);
+        showErrorNotification('Ошибка сервера при сохранении прогресса.');
       }
     } else {
-      alert('Код неверный. Попробуйте снова.');
+      showErrorNotification('Вы уже прошли этот урок.');
     }
   };
 
@@ -98,34 +147,9 @@ const Lesson4Python = () => {
     navigate('/less5python');
   };
 
-  const handleRepeatConfirm = async () => {
+  const handleRepeatConfirm = () => {
     setShowRepeatModal(false);
-    try {
-      const response = await fetch('http://localhost:5000/api/progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
-        },
-        body: JSON.stringify({ course_id: 1, lesson_number: 4 }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setXp(data.points);
-      setSubmitted(true);
-      alert(`Отлично! Вы получили ${data.xp_added} XP.`);
-    } catch (error) {
-      console.error('Ошибка сохранения прогресса:', error.message);
-      if (error.message.includes('404')) {
-        alert('Сервер не найден. Убедитесь, что сервер запущен на http://localhost:5000.');
-      } else if (error.message.includes('401') || error.message.includes('403')) {
-        alert('Ошибка авторизации. Проверьте токен.');
-      } else {
-        alert('Ошибка при сохранении прогресса');
-      }
-    }
+    handleSubmit();
   };
 
   const handleRepeatCancel = () => {
@@ -140,14 +164,12 @@ const Lesson4Python = () => {
         </IconButton>
 
         <h1 className="lesson-title">Урок 4: Циклы в Python</h1>
-        <p className='text-prebig'>
-          Что такое цикл?
-        </p>
+        <p className='text-prebig'>Что такое цикл?</p>
         <p>
-          Цикл — это конструкция, которая позволяет повторять действия несколько раз, пока выполняется определённое условие или пока не закончатся данные.<br></br><br></br>
-          Пример из жизни:<br></br>
-          - Пока не выучишь 10 слов - продолжаешь учить.<br></br>
-          - Или: Пройди по каждому студенту в списке и поздравь с праздником.<br></br>
+          Цикл — это конструкция, которая позволяет повторять действия несколько раз, пока выполняется определённое условие или пока не закончатся данные.<br /><br />
+          Пример из жизни:<br />
+          - Пока не выучишь 10 слов - продолжаешь учить.<br />
+          - Или: Пройди по каждому студенту в списке и поздравь с праздником.<br />
         </p>
         <p>
           В Python используются циклы <strong>for</strong> и <strong>while</strong> для выполнения кода несколько раз.
@@ -157,7 +179,6 @@ const Lesson4Python = () => {
           <li><strong>while</strong> — выполняет блок кода, пока условие истинно.</li>
           <li><strong>break</strong> — используется для прерывания цикла.</li>
         </ul>
-
         <p className="lesson-task">
           Задание: создайте цикл <code>for i in range(5):</code>, и посмотрите что компилятор будет выдавать.
         </p>
@@ -219,6 +240,22 @@ const Lesson4Python = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {achievementNotification && (
+        <Snackbar
+          open={true}
+          onClose={() => setAchievementNotification(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          className="achievement-snackbar"
+          style={{ transition: 'all 0.5s ease-in-out', padding: '2px 0' }}
+        >
+          <Alert severity="success">
+            {achievementNotification.message.split('\n').map((line, index) => (
+              <div key={index}>{line}</div>
+            ))}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   );
 };
