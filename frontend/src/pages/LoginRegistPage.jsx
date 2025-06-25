@@ -44,14 +44,41 @@ const AuthForm = () => {
   };
 
   const formatPhoneNumber = (value) => {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length > 12) return registerData.phone;
+    const digits = value.replace(/\D/g, ''); // Удаляем все нецифровые символы
+    if (digits.length > 11) return registerData.phone; // Ограничиваем до 11 символов (1 + 10)
 
-    let formatted = digits;
-    if (digits.length > 0) formatted = `(${digits.slice(0, 3)}`;
-    if (digits.length > 3) formatted += `)${digits.slice(3, 6)}`;
-    if (digits.length > 6) formatted += `-${digits.slice(6, 8)}`;
-    if (digits.length > 8) formatted += `-${digits.slice(8, 10)}`;
+    let formatted = '';
+    if (digits.length > 0) formatted += digits[0]; // Первый символ отдельно
+    if (digits.length > 1) formatted += '(' + digits.slice(1, 4) + ')'; // (xxx)
+    if (digits.length > 4) formatted += digits.slice(4, 7); // xxx
+    if (digits.length > 7) formatted += '-' + digits.slice(7, 9); // -xx
+    if (digits.length > 9) formatted += '-' + digits.slice(9, 11); // -xx
+
+    // Корректировка для случаев удаления
+    if (value.length < registerData.phone.length) {
+      const prevFormatted = registerData.phone;
+      const diff = prevFormatted.length - formatted.length;
+      if (diff > 0) {
+        // Если удаление произошло, пытаемся сохранить структуру
+        const lastCharRemoved = prevFormatted.slice(-1);
+        if (lastCharRemoved.match(/\d/)) {
+          // Если удален цифра, убираем только ее, сохраняя формат
+          return prevFormatted.slice(0, -1).replace(/\D/g, '').padEnd(digits.length, '').split('').map((d, i) => {
+            if (i === 0) return d;
+            if (i === 1 && digits.length > 1) return '(' + d;
+            if (i > 1 && i < 4 && digits.length > 1) return d;
+            if (i === 4 && digits.length > 4) return ')' + d;
+            if (i > 4 && i < 7 && digits.length > 4) return d;
+            if (i === 7 && digits.length > 7) return '-' + d;
+            if (i > 7 && i < 9 && digits.length > 7) return d;
+            if (i === 9 && digits.length > 9) return '-' + d;
+            if (i > 9 && i < 11 && digits.length > 9) return d;
+            return '';
+          }).join('');
+        }
+      }
+    }
+
     return formatted;
   };
 

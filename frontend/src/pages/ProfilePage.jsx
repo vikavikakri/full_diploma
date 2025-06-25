@@ -27,9 +27,15 @@ const ProfilePage = () => {
         setActiveCourses(data.active_courses || []);
         setXp(data.points || 0);
 
-        // Проверка ачивок после загрузки данных
-        if (profile && Array.isArray(profile.achievements) && profile.achievements.length > 0) {
-          const newbieAchievement = profile.achievements.find(a => a.id === 1); // "Новичок на борту"
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const latestAchievement = data.new_achievements[0];
+          setAchievementNotification({
+            id: latestAchievement.id,
+            name: latestAchievement.name,
+            xp: latestAchievement.xp_reward,
+          });
+        } else if (profile && Array.isArray(profile.achievements) && profile.achievements.length > 0) {
+          const newbieAchievement = profile.achievements.find((a) => a.id === 1); // "Новичок на борту"
           if (newbieAchievement && !localStorage.getItem('isFirstAchievementNotified')) {
             setAchievementNotification({
               id: newbieAchievement.id,
@@ -48,7 +54,6 @@ const ProfilePage = () => {
       fetchData();
     }
 
-    // Показать подсказку редактирования при первом посещении
     const isFirstVisit = !localStorage.getItem('isFirstProfileVisit');
     if (isFirstVisit && profile) {
       setShowEditPrompt(true);
@@ -338,7 +343,6 @@ const ProfilePage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Уведомление о новой ачивке */}
       <Snackbar
         open={!!achievementNotification}
         autoHideDuration={5000}

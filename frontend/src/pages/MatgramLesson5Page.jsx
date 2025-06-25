@@ -1,22 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ProfileContext } from '../context/ProfileContext';
 import solution15 from '../assets/solution15.jpg';
 import './mathlesson.css';
 
 const MathLesson5 = () => {
   const [answer, setAnswer] = useState('');
   const [output, setOutput] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [xp, setXp] = useState(parseInt(localStorage.getItem('xp')) || 0);
   const [currentTask, setCurrentTask] = useState(1);
+  const [completedTasks, setCompletedTasks] = useState([false, false, false]);
   const [showSolution, setShowSolution] = useState(false);
+  const [xpReward, setXpReward] = useState(0);
+  const [isLessonCompleted, setIsLessonCompleted] = useState(false);
+  const { showLessonCompletion, showErrorNotification } = useContext(ProfileContext);
   const navigate = useNavigate();
 
-  const handleBackClick = () => navigate(-1);
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/progress', {
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const mathCourse = data.active_courses.find((course) => course.course_id === 2);
+        if (mathCourse) {
+          const isCompleted = mathCourse.completed_lessons.includes(5);
+          setIsLessonCompleted(isCompleted);
+          if (isCompleted) {
+            setCompletedTasks([true, true, true]);
+            setCurrentTask(1);
+            setXpReward(25);
+          } else {
+            setCompletedTasks([false, false, false]);
+            setCurrentTask(1);
+            const lessonReward = mathCourse?.lessons?.find(l => l.lesson_number === 5)?.xp_reward || 0;
+            setXpReward(lessonReward);
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки прогресса:', error.message);
+        showErrorNotification('Ошибка загрузки прогресса.');
+      }
+    };
+    fetchProgress();
+  }, []);
+
+  const handleBackClick = () => navigate('/matgram');
 
   const tasks = [
     {
@@ -42,22 +78,52 @@ const MathLesson5 = () => {
   const handleCheckAnswer = () => {
     const currentTaskData = tasks[currentTask - 1];
     const correctAnswer = currentTaskData.correct;
+    const newCompletedTasks = [...completedTasks];
+
     if (answer.trim().toLowerCase() === correctAnswer) {
       toast.success('Задача решена верно!', { autoClose: 3000 });
-      if (!submitted) {
-        const newXp = xp + 50;
-        setXp(newXp);
-        localStorage.setItem('xp', newXp);
-        setSubmitted(true);
-      }
+      newCompletedTasks[currentTask - 1] = true;
+      setCompletedTasks(newCompletedTasks);
       if (currentTask < 3) {
         setCurrentTask(currentTask + 1);
         setAnswer('');
         setOutput('');
-        setSubmitted(false);
       }
     } else {
       toast.error('Неверный ответ. Попробуй ещё раз.', { autoClose: 3000 });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!completedTasks.every(task => task)) {
+      showErrorNotification('Пожалуйста, проверьте все задачи перед отправкой.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        },
+        body: JSON.stringify({ course_id: 2, lesson_number: 5, xp_reward: isLessonCompleted ? 25 : xpReward }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      showLessonCompletion(data.xp_added);
+
+      if (data.new_achievements && data.new_achievements.length > 0) {
+        const message = data.new_achievements.map((a) => `Ачивка "${a.name}" +${a.xp_reward} XP`).join('\n');
+        toast.success(`Поздравляем!\n${message}`, { autoClose: 5000 });
+      }
+
+      navigate('/less6math');
+    } catch (error) {
+      console.error('Ошибка сохранения прогресса:', error.message);
+      showErrorNotification('Ошибка сервера при сохранении прогресса.');
     }
   };
 
@@ -69,10 +135,6 @@ const MathLesson5 = () => {
     setShowSolution(false);
   };
 
-  const handleNextLesson = () => {
-    navigate('/less6math'); 
-  };
-
   return (
     <div className="lesson-container">
       <div className="lesson-left">
@@ -82,7 +144,7 @@ const MathLesson5 = () => {
 
         <h1 className="lesson-title">Урок 5: Показательная и логарифмическая функции</h1>
         <p className="lesson-text">
-          Добро пожаловать на пятый курса! Сегодня мы подробно разберём показательные и логарифмические функции, которые имеют важное значение в математике, физике, экономике и других науках. Эти функции описывают процессы роста и убывания, такие как рост населения или радиоактивный распад, и часто встречаются в задачах ЕНТ. Давайте начнём с основ.
+          Добро пожаловать на пятый курс! Сегодня мы подробно разберём показательные и логарифмические функции, которые имеют важное значение в математике, физике, экономике и других науках. Эти функции описывают процессы роста и убывания, такие как рост населения или радиоактивный распад, и часто встречаются в задачах ЕНТ. Давайте начнём с основ.
         </p>
         <p className="lesson-text">
           Показательная функция имеет вид y = a в степени x, где a больше 0 и a не равно 1, а x — любой действительный номер. Например, y = 2 в степени x начинается с 1 при x = 0, так как a в нулевой степени равно 1, растёт экспоненциально при положительных x и убывает к нулю при отрицательных x. Если a = e, примерно 2.718, функция y = e в степени x особенно важна в естественных науках. Свойства включают: a в степени (x + y) равно a в степени x умножить на a в степени y, (a в степени x) в степени y равно a в степени (x умножить на y), и a в минус x равно 1 делить на a в степени x. График всегда проходит через точку (0, 1) и монотонен, что делает его полезным для моделирования.
@@ -166,14 +228,14 @@ const MathLesson5 = () => {
           </DialogActions>
         </Dialog>
 
-        {currentTask === 3 && submitted && (
+        {completedTasks.every(task => task) && currentTask === 3 && (
           <Button
             variant="contained"
             className="button-math-check"
-            onClick={handleNextLesson}
+            onClick={handleSubmit}
             sx={{ mt: 2 }}
           >
-            Отправить решения
+            Перейти к уроку 6
           </Button>
         )}
       </div>

@@ -42,6 +42,7 @@
     width: 60px;
     color: #3d5d52 !important;
     padding: 8px !important;
+    height: 43px;
 }
 
 
@@ -231,4 +232,21 @@
         width: 91%;
         padding: 20px;
     }
+}
+
+
+/* Добавить в конец файла mathlesson.css */
+
+.lives-container {
+    margin: 10px 0;
+}
+
+.heart {
+    color: red;
+    font-size: 44px;
+    padding-right: 8px;
+}
+
+.heart.grey {
+    color: grey;
 }

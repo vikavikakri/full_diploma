@@ -50,6 +50,7 @@ import MatgramLesson8Page from './pages/MatgramLesson8Page';
 import MatgramLesson9Page from './pages/MatgramLesson9Page';
 import MatgramLesson10Page from './pages/MatgramLesson10Page';
 import MatgramLesson11Page from './pages/MatgramLesson11Page';
+import MathTest1 from './pages/MathTest1';
 import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditUserProfile';
 import { ToastContainer } from 'react-toastify';
@@ -131,7 +132,7 @@ function AppContent() {
       '/less14python', '/less15python', '/less1csh', '/less2csh', '/less3csh', '/less4csh',
       '/less1html', '/less2html', '/less3html', '/less4html', '/less5html', '/less1go',
       '/less2go', '/less3go', '/less4go', '/less5go', '/less1math', '/less2math',
-      '/less3math', '/less4math', '/less5math', '/less6math', '/less7math', '/less8math', '/less9math', '/less10math', '/less11math'
+      '/less3math', '/less4math', '/less5math', '/less6math', '/less7math', '/less8math', '/less9math', '/less10math', '/less11math', '/test1math'
     ];
 
     if (!token && protectedRoutes.includes(location.pathname)) {
@@ -184,6 +185,7 @@ function AppContent() {
         location.pathname !== '/less9math' &&
         location.pathname !== '/less10math' &&
         location.pathname !== '/less11math' &&
+        location.pathname !== '/test1math' &&
         location.pathname !== '/profile' && 
         location.pathname !== '/edit-profile' && <Header />}
       
@@ -242,6 +244,7 @@ function AppContent() {
         <Route path="/less9math" element={<MatgramLesson9Page />} />
         <Route path="/less10math" element={<MatgramLesson10Page />} />
         <Route path="/less11math" element={<MatgramLesson11Page />} />
+        <Route path="/test1math" element={<MathTest1 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
       </Routes>
@@ -299,6 +302,7 @@ function AppContent() {
         location.pathname !== '/less9math' &&
         location.pathname !== '/less10math' &&
         location.pathname !== '/less11math' &&
+        location.pathname !== '/test1math' &&
         location.pathname !== '/profile' && 
         location.pathname !== '/edit-profile' && <Footer />}
       
